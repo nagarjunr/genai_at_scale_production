@@ -53,7 +53,6 @@ Replace the entire content of `instant.py` with:
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
 from openai import OpenAI
-import os
 
 app = FastAPI()
 
