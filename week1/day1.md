@@ -106,24 +106,20 @@ Create a new file called `vercel.json` with the following content:
 
 Save the file.
 
-## Step 6: Install Node.js via NVM
+## Step 6: Install Node.js
 
-Node.js is required for the Vercel CLI. We'll install it using NVM (Node Version Manager) for easy version management.
+Node.js is required for the Vercel CLI.
 
-1. Visit the NVM installation guide: [https://github.com/nvm-sh/nvm#installing-and-updating](https://github.com/nvm-sh/nvm#installing-and-updating)
-   - **Windows users:** Use nvm-windows instead: [https://github.com/coreybutler/nvm-windows#installation--upgrades](https://github.com/coreybutler/nvm-windows#installation--upgrades)
+1. Visit the official Node.js download page: [https://nodejs.org/en/download](https://nodejs.org/en/download)
 
-2. Follow the installation instructions for your operating system
+2. Choose your preferred installation method:
+   - **Direct Download:** Download the installer for your operating system
+   - **Package Manager:** Use the package manager for your platform (Homebrew for Mac, Chocolatey for Windows, etc.)
+   - **Version Manager (recommended):** Use nvm, fnm, or volta for easy version management
 
-3. After installing NVM, open a **new** terminal window (important: must be new to load NVM)
+3. After installation, open a **new** terminal window
 
-4. Install the latest Node.js:
-   ```bash
-   nvm install node
-   nvm use node
-   ```
-
-5. Verify installation:
+4. Verify installation:
    ```bash
    node --version
    npm --version
