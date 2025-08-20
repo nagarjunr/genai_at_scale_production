@@ -166,13 +166,6 @@ Both commands should return version numbers if installed correctly.
    - Click the URL provided (or copy and paste into browser)
    - You should see: **"Live from production!"**
 
-5. Deploy to production:
-   ```bash
-   vercel --prod
-   ```
-   - This creates a production deployment
-   - You'll get a permanent URL like `https://instant.vercel.app`
-   - Test this URL in your browser
 
 ## Congratulations! 🎉
 
@@ -186,7 +179,6 @@ You've successfully deployed your first API to production! Your API is now:
 - How to create a simple FastAPI application
 - How to configure a project for Vercel deployment
 - How to use the Vercel CLI for deployment
-- The difference between development and production deployments
 
 ### Next Steps:
 - Try modifying the message in `instant.py` and redeploying
