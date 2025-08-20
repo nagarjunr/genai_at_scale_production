@@ -1,4 +1,6 @@
-# Day 1: Deploy Your First API to Production
+# INSTANT GRATIFICATION!
+
+## Production Deployment in minutes
 
 This guide will walk you through deploying a simple FastAPI application to Vercel in under 10 minutes.
 
