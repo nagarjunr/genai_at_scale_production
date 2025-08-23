@@ -181,8 +181,7 @@ We need to modify our Day 4 application for AWS deployment. The key change: we'l
 Your project should look like this:
 ```
 saas/
-├── pages/                  # Next.js Pages Router
-├── styles/                 # CSS styles
+├── app/                    # Next.js App Router
 ├── api/                    # FastAPI backend
 ├── public/                 # Static assets
 ├── node_modules/          
@@ -198,8 +197,15 @@ saas/
 
 **Important Architecture Change**: On Vercel, our Next.js app could make server-side requests. For AWS simplicity, we'll export Next.js as static HTML/JS files and serve them from our Python backend. This means everything runs in one container!
 
-**Note about Middleware**: 
-With Pages Router, we don't use middleware files. Authentication is handled entirely by Clerk's client-side components (`<Protect>`, `<SignedIn>`, etc.) which work perfectly with static exports.
+**Critical Step - Remove Middleware**: 
+Static exports cannot use middleware. If you have a `middleware.ts` file in your project root from Day 3's Clerk setup, you MUST delete it:
+
+```bash
+# Check if middleware exists and remove it
+rm middleware.ts 2>/dev/null || rm src/middleware.ts 2>/dev/null || echo "No middleware file found"
+```
+
+The authentication will still work! Clerk's client-side components (`<Protect>`, `<SignedIn>`, etc.) handle authentication without needing middleware.
 
 Update `next.config.ts`:
 
@@ -232,7 +238,7 @@ Change it to:
 
 Since we're serving everything from the same container, we need to update how the frontend calls the backend.
 
-Update `pages/product.tsx` - find the `fetchEventSource` call and change it:
+Update `app/product/page.tsx` - find the `fetchEventSource` call and change it:
 
 ```typescript
 // Old (Vercel):

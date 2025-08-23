@@ -108,49 +108,39 @@ Note the key changes:
 - Added a `Visit` model to validate incoming data
 - Structured prompts for healthcare-specific output
 
-## Step 3: Update Application Configuration
+## Step 3: Add Date Picker CSS
 
-First, import the date picker styles in `pages/_app.tsx`:
+Import the date picker styles in `app/layout.tsx`:
 
 ```typescript
+import type { Metadata } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
-import type { AppProps } from 'next/app';
 import 'react-datepicker/dist/react-datepicker.css';
-import '../styles/globals.css';
+import './globals.css';
 
-export default function MyApp({ Component, pageProps }: AppProps) {
+export const metadata: Metadata = {
+  title: 'Healthcare Consultation Assistant',
+  description: 'AI-powered medical consultation summaries',
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <ClerkProvider {...pageProps}>
-      <Component {...pageProps} />
+    <ClerkProvider>
+      <html lang="en">
+        <body>{children}</body>
+      </html>
     </ClerkProvider>
-  );
-}
-```
-
-Now update `pages/_document.tsx` to reflect the healthcare focus:
-
-```typescript
-import { Html, Head, Main, NextScript } from 'next/document';
-
-export default function Document() {
-  return (
-    <Html lang="en">
-      <Head>
-        <title>Healthcare Consultation Assistant</title>
-        <meta name="description" content="AI-powered medical consultation summaries" />
-      </Head>
-      <body>
-        <Main />
-        <NextScript />
-      </body>
-    </Html>
   );
 }
 ```
 
 ## Step 4: Create the Consultation Form
 
-Replace `pages/product.tsx` with the new healthcare interface:
+Replace `app/product/page.tsx` with the new healthcare interface:
 
 ```typescript
 "use client"
@@ -328,7 +318,7 @@ export default function Product() {
 
 ## Step 5: Update the Landing Page
 
-Update `pages/index.tsx` to reflect the healthcare focus:
+Update `app/page.tsx` to reflect the healthcare focus:
 
 ```typescript
 "use client"
@@ -515,7 +505,7 @@ Your healthcare app now:
 - Verify the fetch request uses `method: 'POST'`
 
 ### Date picker not styled correctly
-- Ensure `react-datepicker/dist/react-datepicker.css` is imported in `pages/_app.tsx`
+- Ensure `react-datepicker/dist/react-datepicker.css` is imported in layout.tsx
 - Check that the date picker has the correct className for Tailwind styling
 
 ### Form data not sending

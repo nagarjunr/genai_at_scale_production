@@ -132,10 +132,10 @@ export default function Home() {
 
 ## Step 3: Update pages/product.tsx
 
-Replace with your working version, but update the API path:
+Replace with this exact working version:
 
 ```typescript
-"use client"
+'use client';
 
 import { useState, FormEvent } from 'react';
 import { useAuth } from '@clerk/nextjs';
@@ -173,7 +173,7 @@ function ConsultationForm() {
         const controller = new AbortController();
         let buffer = '';
 
-        await fetchEventSource('/api/consultation', {
+        await fetchEventSource('/api', {
             signal: controller.signal,
             method: 'POST',
             headers: {
@@ -202,11 +202,11 @@ function ConsultationForm() {
 
     return (
         <div className="container mx-auto px-4 py-12 max-w-3xl">
-            <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-8">
-                Consultation Notes
-            </h1>
+                <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-8">
+                    Consultation Notes
+                </h1>
 
-            <form onSubmit={handleSubmit} className="space-y-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
+                <form onSubmit={handleSubmit} className="space-y-6 bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8">
                 <div className="space-y-2">
                     <label htmlFor="patient" className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                         Patient Name
@@ -269,7 +269,7 @@ function ConsultationForm() {
                         </ReactMarkdown>
                     </div>
                 </section>
-            )}
+                )}
         </div>
     );
 }
@@ -282,7 +282,7 @@ export default function Product() {
                 <UserButton showName={true} />
             </div>
 
-            {/* Subscription Protection */}
+            {/* Subscription Protection - same as Day 4 */}
             <Protect
                 plan="premium_subscription"
                 fallback={
@@ -315,12 +315,17 @@ Create a new file `pages/_app.tsx`:
 ```typescript
 import { ClerkProvider } from '@clerk/nextjs';
 import type { AppProps } from 'next/app';
+import Head from 'next/head';
 import 'react-datepicker/dist/react-datepicker.css';
 import '../styles/globals.css';
 
 export default function MyApp({ Component, pageProps }: AppProps) {
   return (
     <ClerkProvider {...pageProps}>
+      <Head>
+        <title>Healthcare Consultation Assistant</title>
+        <meta name="description" content="AI-powered medical consultation summaries" />
+      </Head>
       <Component {...pageProps} />
     </ClerkProvider>
   );
@@ -337,10 +342,7 @@ import { Html, Head, Main, NextScript } from 'next/document';
 export default function Document() {
   return (
     <Html lang="en">
-      <Head>
-        <title>Healthcare Consultation Assistant</title>
-        <meta name="description" content="AI-powered medical consultation summaries" />
-      </Head>
+      <Head />
       <body>
         <Main />
         <NextScript />

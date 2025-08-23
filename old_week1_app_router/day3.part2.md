@@ -55,9 +55,9 @@ After creating the plan, you'll see a **Plan ID** in the top right of the plan c
 
 ## Step 3: Update Your Product Page
 
-Since we're using Pages Router with client-side components, we need to protect our product route with the subscription check.
+Since we're using App Router with client-side components, we need to protect our product route with the subscription check.
 
-Update `pages/product.tsx`:
+Update `app/product/page.tsx`:
 
 ```typescript
 "use client"
@@ -171,7 +171,7 @@ export default function Product() {
 
 Let's update the landing page to better reflect the subscription model.
 
-Update `pages/index.tsx`:
+Update `app/page.tsx`:
 
 ```typescript
 "use client"

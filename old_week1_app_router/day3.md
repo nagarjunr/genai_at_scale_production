@@ -11,7 +11,7 @@ An authenticated version of your app that:
 - Supports multiple authentication providers (Google, GitHub, Email)
 - Passes secure JWT tokens to your backend
 - Verifies user identity on every API request
-- Works seamlessly with Next.js Pages Router
+- Works seamlessly with Next.js App Router
 
 ## Prerequisites
 
@@ -69,17 +69,28 @@ Open `.gitignore` in Cursor and add `.env.local` on a new line.
 
 ### Step 5: Add Clerk Provider to Your App
 
-With Pages Router, we need to wrap our application with the Clerk provider. Update `pages/_app.tsx`:
+With App Router, we need to wrap our application with the Clerk provider. Update `app/layout.tsx`:
 
 ```typescript
+import type { Metadata } from 'next';
 import { ClerkProvider } from '@clerk/nextjs';
-import type { AppProps } from 'next/app';
-import '../styles/globals.css';
+import './globals.css';
 
-export default function MyApp({ Component, pageProps }: AppProps) {
+export const metadata: Metadata = {
+  title: 'Business Idea Generator',
+  description: 'AI-powered business idea generation',
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <ClerkProvider {...pageProps}>
-      <Component {...pageProps} />
+    <ClerkProvider>
+      <html lang="en">
+        <body>{children}</body>
+      </html>
     </ClerkProvider>
   );
 }
@@ -89,7 +100,7 @@ export default function MyApp({ Component, pageProps }: AppProps) {
 
 Move your business idea generator to a protected route. Since we're using client-side authentication, we'll protect this route using Clerk's built-in components.
 
-Create `pages/product.tsx`:
+Create `app/product/page.tsx`:
 
 ```typescript
 "use client"
@@ -169,7 +180,7 @@ export default function Product() {
 
 ### Step 7: Create the Landing Page
 
-Update `pages/index.tsx` to be your new landing page with sign-in:
+Update `app/page.tsx` to be your new landing page with sign-in:
 
 ```typescript
 "use client"

@@ -7,7 +7,7 @@ Today you'll build a complete full-stack application with a React frontend and P
 ## What You'll Build
 
 A **Business Idea Generator** - an AI-powered SaaS application that:
-- Has a modern React frontend built with Next.js (using Pages Router for stability)
+- Has a modern React frontend built with Next.js (using App Router)
 - Uses TypeScript for type safety
 - Connects to a FastAPI backend
 - Streams AI responses in real-time
@@ -29,22 +29,22 @@ A **Business Idea Generator** - an AI-powered SaaS application that:
 4. Create a new Next.js project with TypeScript:
 
 ```bash
-npx create-next-app@latest saas --typescript
+npx create-next-app@latest saas --typescript --app
 ```
 
-When prompted with "Would you like to use App Router? (recommended)", select **No** by typing `n` and pressing Enter.
-
-For the other prompts, press Enter to accept the defaults:
+When prompted, press Enter to accept the defaults for all questions:
 - Would you like to use ESLint? → **Yes** (default)
 - Would you like to use Tailwind CSS? → **Yes** (default)
 - Would you like to use `src/` directory? → **No** (default)
+- Would you like to use Turbopack for `next dev`? → **Yes** (default)
 - Would you like to customize the default import alias? → **No** (default)
 
 This command creates a new Next.js project with:
-- **Pages Router** (the stable, battle-tested routing system)
+- **App Router** (the modern Next.js routing system)
 - **TypeScript** for type safety
 - **ESLint** for catching errors and enforcing code quality
 - **Tailwind CSS** for utility-first styling
+- **Turbopack** for faster development builds
 
 ### Open Your Project
 
@@ -57,26 +57,25 @@ Next.js created these key files and folders:
 
 ```
 saas/
-├── pages/              # Pages Router directory (where your pages live)
-│   ├── _app.tsx       # Application wrapper (initializes pages)
-│   ├── _document.tsx  # Custom document (HTML structure)
-│   ├── index.tsx      # Homepage (routes to "/")
-│   └── api/           # API routes directory
-├── styles/            # Styles directory
-│   ├── globals.css    # Global styles (includes Tailwind)
-│   └── Home.module.css # Homepage styles (optional)
-├── public/            # Static files (images, fonts, etc.)
-├── package.json       # Node.js dependencies and scripts
-├── tsconfig.json      # TypeScript configuration
-├── next.config.js     # Next.js configuration
-└── node_modules/      # Installed packages (auto-generated)
+├── app/                 # App Router directory (where your pages live)
+│   ├── layout.tsx      # Root layout (wraps all pages)
+│   ├── page.tsx        # Homepage (routes to "/")
+│   ├── favicon.ico     # Browser tab icon
+│   └── globals.css     # Global styles (includes Tailwind)
+├── public/             # Static files (images, fonts, etc.)
+├── eslint.config.mjs   # ESLint configuration (code quality rules)
+├── postcss.config.mjs  # PostCSS config (for Tailwind)
+├── package.json        # Node.js dependencies and scripts
+├── tsconfig.json       # TypeScript configuration
+├── next.config.ts      # Next.js configuration
+└── node_modules/       # Installed packages (auto-generated)
 ```
 
 **Key files explained:**
-- **`pages/_app.tsx`**: The application wrapper that initializes all pages. Used for global providers and styles
-- **`pages/_document.tsx`**: Custom document for modifying the HTML structure
-- **`pages/index.tsx`**: Your homepage component. This is what users see at "/"
-- **`styles/globals.css`**: Global styles including Tailwind CSS imports
+- **`app/layout.tsx`**: The root layout that wraps all pages. Think of it as the HTML skeleton
+- **`app/page.tsx`**: Your homepage component. This is what users see at "/"
+- **`app/globals.css`**: Global styles including Tailwind CSS imports
+- **`eslint.config.mjs`**: ESLint rules that help catch errors and maintain code quality
 
 ### What is Tailwind CSS?
 
@@ -124,18 +123,20 @@ def idea():
     return response.choices[0].message.content
 ```
 
-## Step 3: Create Your First Page
+## Step 3: Create Your First App Router Page
 
 ### Understanding Client Components
 
-In Next.js Pages Router, all page components run on both server and client by default. Since we're using a **Python/FastAPI backend** for our API (not Next.js's server), we'll mark our components with `"use client"` to ensure:
+In Next.js App Router, components are **Server Components** by default (they run on the Next.js server). However, we're using a **Python/FastAPI backend** for our API, not Next.js's server. 
+
+We need to make our component a **Client Component** by adding `"use client"` at the top. This ensures:
 - The component runs in the browser
 - The browser makes direct API calls to our Python backend
 - We're not trying to use Next.js as a middleman server
 
 ### Create the Homepage
 
-Replace the entire contents of `pages/index.tsx` with:
+Replace the entire contents of `app/page.tsx` with:
 
 ```typescript
 "use client"
@@ -171,44 +172,32 @@ export default function Home() {
 - `"use client"` tells Next.js this component runs in the browser
 - The browser directly calls our Python FastAPI backend at `/api`
 - We use React hooks to manage the UI state and fetch the data
-- Vercel routes `/api` requests to our Python server (we don't need vercel.json configuration)
+- Vercel routes `/api` requests to our Python server (configured in vercel.json)
 
-### Set Up the Application Wrapper
+### Clean Up the Layout
 
-The `_app.tsx` file wraps all your pages. Let's create it to import our styles.
+The layout file wraps all your pages. Let's update it to work with Tailwind.
 
-Create or replace `pages/_app.tsx` with:
-
-```typescript
-import type { AppProps } from 'next/app';
-import '../styles/globals.css';  // This imports Tailwind styles
-
-export default function MyApp({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />;
-}
-```
-
-### Set Up the Document
-
-Now let's customize the HTML structure and add metadata.
-
-Create `pages/_document.tsx`:
+Replace `app/layout.tsx` with:
 
 ```typescript
-import { Html, Head, Main, NextScript } from 'next/document';
+import type { Metadata } from 'next';
+import './globals.css';  // This imports Tailwind styles
 
-export default function Document() {
+export const metadata: Metadata = {
+  title: 'Business Idea Generator',
+  description: 'AI-powered business idea generation',
+};
+
+export default function RootLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
-    <Html lang="en">
-      <Head>
-        <title>Business Idea Generator</title>
-        <meta name="description" content="AI-powered business idea generation" />
-      </Head>
-      <body>
-        <Main />
-        <NextScript />
-      </body>
-    </Html>
+    <html lang="en">
+      <body>{children}</body>
+    </html>
   );
 }
 ```
@@ -280,7 +269,7 @@ npm install react-markdown remark-gfm remark-breaks
 
 ### Update the Frontend
 
-Replace `pages/index.tsx` with:
+Replace `app/page.tsx` with:
 
 ```typescript
 "use client"
@@ -391,7 +380,7 @@ Let's make your app look professional with modern styling.
 
 ### Fix Markdown Rendering
 
-First, we need to restore the default HTML styles that Tailwind removes. Add this to the bottom of your `styles/globals.css` file:
+First, we need to restore the default HTML styles that Tailwind removes. Add this to the bottom of your `app/globals.css` file:
 
 ```css
 @layer base {
@@ -465,7 +454,7 @@ prompt = [{"role": "user", "content": "Reply with a new business idea for AI Age
 
 ### Update Your Component
 
-Now replace `pages/index.tsx` with:
+Now replace `app/page.tsx` with:
 
 ```typescript
 "use client"
@@ -553,7 +542,7 @@ vercel --prod
 ## Congratulations! 🎉
 
 You've built a complete SaaS application with:
-- ✅ Modern React frontend with Next.js Pages Router
+- ✅ Modern React frontend with Next.js App Router
 - ✅ TypeScript for type safety
 - ✅ FastAPI Python backend
 - ✅ Real-time streaming AI responses
@@ -564,28 +553,28 @@ You've built a complete SaaS application with:
 ## What You've Learned
 
 - How to structure a full-stack application
-- Building with Next.js Pages Router
-- Understanding client-side rendering for API calls
+- Building with Next.js App Router
+- Understanding Client vs Server Components
 - Creating API endpoints with FastAPI
 - Implementing Server-Sent Events for streaming
 - Rendering Markdown content in React
 - Deploying full-stack apps to Vercel
 
-## Understanding Pages Router Concepts
+## Understanding App Router Concepts
 
-**Pages Router Structure:**
-- Each file in `pages/` becomes a route
-- `pages/index.tsx` → `/`
-- `pages/product.tsx` → `/product`
-- `pages/api/` → API routes (though we're using Python instead)
-
-**Client-Side Rendering (`"use client"`):**
-- Components marked with `"use client"` run primarily in the browser
+**Client Components (`"use client"`):**
+- Run in the browser
 - Can use React hooks (useState, useEffect)
+- Can handle user interactions
 - Perfect for dynamic, interactive UI
-- We use this for all our pages since we're calling a Python backend
 
-In this project, we used client-side components because we needed browser features for real-time streaming and connecting to our FastAPI backend.
+**Server Components (default):**
+- Run on the server
+- Can fetch data directly from databases
+- Better for static content
+- More secure (API keys stay on server)
+
+In this project, we used Client Components because we needed browser features for real-time streaming and state management.
 
 ## Next Steps
 
