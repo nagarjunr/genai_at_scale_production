@@ -32,15 +32,15 @@ A **Business Idea Generator** - an AI-powered SaaS application that:
 npx create-next-app@latest saas --typescript
 ```
 
-When prompted with "Would you like to use App Router? (recommended)", select **No** by typing `n` and pressing Enter.
+When prompted, respond to each question:
+1. **Which linter would you like to use?** → Press Enter for **ESLint** (default)
+2. **Would you like to use Tailwind CSS?** → Type `y` and press Enter for **Yes**
+3. **Would you like your code inside a `src/` directory?** → Type `n` and press Enter for **No**
+4. **Would you like to use App Router? (recommended)** → Type `n` and press Enter for **No** (we're using Pages Router)
+5. **Would you like to use Turbopack? (recommended)** → Type `n` and press Enter for **No** (we'll keep the standard build for compatibility)
+6. **Would you like to customize the import alias?** → Type `n` and press Enter for **No**
 
-For the other prompts, press Enter to accept the defaults:
-- Would you like to use ESLint? → **Yes** (default)
-- Would you like to use Tailwind CSS? → **Yes** (default)
-- Would you like to use `src/` directory? → **No** (default)
-- Would you like to customize the default import alias? → **No** (default)
-
-This command creates a new Next.js project with:
+This creates a new Next.js project with:
 - **Pages Router** (the stable, battle-tested routing system)
 - **TypeScript** for type safety
 - **ESLint** for catching errors and enforcing code quality
@@ -61,10 +61,10 @@ saas/
 │   ├── _app.tsx       # Application wrapper (initializes pages)
 │   ├── _document.tsx  # Custom document (HTML structure)
 │   ├── index.tsx      # Homepage (routes to "/")
-│   └── api/           # API routes directory
+│   └── api/           # API routes directory (we'll remove this)
+│       └── hello.ts   # Sample API route (we'll remove this)
 ├── styles/            # Styles directory
-│   ├── globals.css    # Global styles (includes Tailwind)
-│   └── Home.module.css # Homepage styles (optional)
+│   └── globals.css    # Global styles (includes Tailwind)
 ├── public/            # Static files (images, fonts, etc.)
 ├── package.json       # Node.js dependencies and scripts
 ├── tsconfig.json      # TypeScript configuration
@@ -77,6 +77,15 @@ saas/
 - **`pages/_document.tsx`**: Custom document for modifying the HTML structure
 - **`pages/index.tsx`**: Your homepage component. This is what users see at "/"
 - **`styles/globals.css`**: Global styles including Tailwind CSS imports
+
+### Clean Up Unnecessary Files
+
+Since we're using a Python FastAPI backend (not Next.js API routes), let's remove the sample API directory:
+
+1. In Cursor's file explorer (left sidebar), find the `pages/api` folder
+2. Right-click on the `api` folder
+3. Select **Delete** (or press Delete/Backspace key)
+4. Confirm the deletion when prompted
 
 ### What is Tailwind CSS?
 

@@ -216,18 +216,6 @@ const nextConfig: NextConfig = {
 export default nextConfig;
 ```
 
-**Important**: Also update your `package.json` build script to remove the `--turbopack` flag (it's incompatible with static export):
-
-Find this line in `package.json`:
-```json
-"build": "next build --turbopack",
-```
-
-Change it to:
-```json
-"build": "next build",
-```
-
 ### Step 3: Update Frontend API Calls
 
 Since we're serving everything from the same container, we need to update how the frontend calls the backend.
@@ -355,9 +343,9 @@ CLERK_SECRET_KEY=sk_test_...
 CLERK_JWKS_URL=https://...
 OPENAI_API_KEY=sk-...
 
-# Add AWS configuration (use your chosen region from earlier)
-DEFAULT_AWS_REGION=us-east-1  # or us-west-2, eu-west-1, ap-southeast-1, etc.
-AWS_ACCOUNT_ID=123456789012  # Your 12-digit account ID
+# Add AWS configuration (use your chosen region from earlier) - us-east-1 or eu-west-1 etc
+DEFAULT_AWS_REGION=us-east-1
+AWS_ACCOUNT_ID=123456789012
 ```
 
 **To find your AWS Account ID**:
