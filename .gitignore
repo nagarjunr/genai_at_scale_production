@@ -174,3 +174,7 @@ cython_debug/
 .pypirc
 
 .DS_Store
+
+finale/.bedrock_agentcore.yaml
+finale/Dockerfile
+finale/.dockerignore
