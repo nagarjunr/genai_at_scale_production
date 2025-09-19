@@ -196,7 +196,7 @@ uv.lock
 
 In Cursor's file explorer (the left sidebar):
 
-1. Right-click on your `twin` folder
+1. Right-click in the file explorer in the blank space below all the files
 2. Select **New Folder**
 3. Name it `terraform`
 
@@ -735,7 +735,7 @@ This change allows the frontend to:
 
 In Cursor's file explorer (the left sidebar):
 
-1. Right-click on your `twin` folder (the project root)
+1. Right-click in the File Explorer in the blank space under the files
 2. Select **New Folder**
 3. Name it `scripts`
 
@@ -757,7 +757,7 @@ echo "🚀 Deploying ${PROJECT_NAME} to ${ENVIRONMENT}..."
 # 1. Build Lambda package
 cd "$(dirname "$0")/.."        # project root
 echo "📦 Building Lambda package..."
-(cd backend && uv run python deploy.py)
+(cd backend && uv run deploy.py)
 
 # 2. Terraform workspace & apply
 cd terraform
@@ -824,13 +824,13 @@ param(
 )
 $ErrorActionPreference = "Stop"
 
-Write-Host "🚀 Deploying $ProjectName to $Environment ..." -ForegroundColor Green
+Write-Host "Deploying $ProjectName to $Environment ..." -ForegroundColor Green
 
 # 1. Build Lambda package
 Set-Location (Split-Path $PSScriptRoot -Parent)   # project root
-Write-Host "📦 Building Lambda package..." -ForegroundColor Yellow
+Write-Host "Building Lambda package..." -ForegroundColor Yellow
 Set-Location backend
-uv run python deploy.py
+uv run deploy.py
 Set-Location ..
 
 # 2. Terraform workspace & apply
@@ -862,7 +862,7 @@ try { $CustomUrl = terraform output -raw custom_domain_url } catch { $CustomUrl 
 Set-Location ..\frontend
 
 # Create production environment file with API URL
-Write-Host "📝 Setting API URL for production..." -ForegroundColor Yellow
+Write-Host "Setting API URL for production..." -ForegroundColor Yellow
 "NEXT_PUBLIC_API_URL=$ApiUrl" | Out-File .env.production -Encoding utf8
 
 npm install
@@ -872,12 +872,13 @@ Set-Location ..
 
 # 4. Final summary
 $CfUrl = terraform -chdir=terraform output -raw cloudfront_url
-Write-Host "`n✅ Deployment complete!" -ForegroundColor Green
-Write-Host "🌐 CloudFront URL : $CfUrl" -ForegroundColor Cyan
+Write-Host "Deployment complete!" -ForegroundColor Green
+Write-Host "CloudFront URL : $CfUrl" -ForegroundColor Cyan
 if ($CustomUrl) {
-    Write-Host "🔗 Custom domain  : $CustomUrl" -ForegroundColor Cyan
+    Write-Host "Custom domain  : $CustomUrl" -ForegroundColor Cyan
 }
-Write-Host "📡 API Gateway    : $ApiUrl" -ForegroundColor Cyan
+Write-Host "API Gateway    : $ApiUrl" -ForegroundColor Cyan
+
 ```
 
 ## Part 5: Deploy Development Environment
@@ -885,7 +886,7 @@ Write-Host "📡 API Gateway    : $ApiUrl" -ForegroundColor Cyan
 ### Step 1: Initialize Terraform
 
 ```bash
-cd twin/terraform
+cd terraform
 terraform init
 ```
 
@@ -899,15 +900,13 @@ Terraform has been successfully initialized!
 
 ### Step 2: Deploy Using the Script
 
-**Mac/Linux:**
+**Mac/Linux from the project root:**
 ```bash
-cd twin
 ./scripts/deploy.sh dev
 ```
 
-**Windows (PowerShell):**
+**Windows (PowerShell) from the project root:**
 ```powershell
-cd twin
 .\scripts\deploy.ps1 -Environment dev
 ```
 
@@ -1056,12 +1055,12 @@ param(
 
 # Validate environment parameter
 if ($Environment -notmatch '^(dev|test|prod)$') {
-    Write-Host "❌ Error: Invalid environment '$Environment'" -ForegroundColor Red
+    Write-Host "Error: Invalid environment '$Environment'" -ForegroundColor Red
     Write-Host "Available environments: dev, test, prod" -ForegroundColor Yellow
     exit 1
 }
 
-Write-Host "🗑️ Preparing to destroy $ProjectName-$Environment infrastructure..." -ForegroundColor Yellow
+Write-Host "Preparing to destroy $ProjectName-$Environment infrastructure..." -ForegroundColor Yellow
 
 # Navigate to terraform directory
 Set-Location (Join-Path (Split-Path $PSScriptRoot -Parent) "terraform")
@@ -1069,7 +1068,7 @@ Set-Location (Join-Path (Split-Path $PSScriptRoot -Parent) "terraform")
 # Check if workspace exists
 $workspaces = terraform workspace list
 if (-not ($workspaces | Select-String $Environment)) {
-    Write-Host "❌ Error: Workspace '$Environment' does not exist" -ForegroundColor Red
+    Write-Host "Error: Workspace '$Environment' does not exist" -ForegroundColor Red
     Write-Host "Available workspaces:" -ForegroundColor Yellow
     terraform workspace list
     exit 1
@@ -1078,7 +1077,7 @@ if (-not ($workspaces | Select-String $Environment)) {
 # Select the workspace
 terraform workspace select $Environment
 
-Write-Host "📦 Emptying S3 buckets..." -ForegroundColor Yellow
+Write-Host "Emptying S3 buckets..." -ForegroundColor Yellow
 
 # Get AWS Account ID for bucket names
 $awsAccountId = aws sts get-caller-identity --query Account --output text
@@ -1105,7 +1104,7 @@ try {
     Write-Host "  Memory bucket not found or already empty" -ForegroundColor Gray
 }
 
-Write-Host "🔥 Running terraform destroy..." -ForegroundColor Yellow
+Write-Host "Running terraform destroy..." -ForegroundColor Yellow
 
 # Run terraform destroy with auto-approve
 if ($Environment -eq "prod" -and (Test-Path "prod.tfvars")) {
@@ -1119,9 +1118,9 @@ if ($Environment -eq "prod" -and (Test-Path "prod.tfvars")) {
                      -auto-approve
 }
 
-Write-Host "✅ Infrastructure for $Environment has been destroyed!" -ForegroundColor Green
+Write-Host "Infrastructure for $Environment has been destroyed!" -ForegroundColor Green
 Write-Host ""
-Write-Host "💡 To remove the workspace completely, run:" -ForegroundColor Cyan
+Write-Host "  To remove the workspace completely, run:" -ForegroundColor Cyan
 Write-Host "   terraform workspace select default" -ForegroundColor White
 Write-Host "   terraform workspace delete $Environment" -ForegroundColor White
 ```
@@ -1337,7 +1336,7 @@ terraform import aws_lambda_function.api twin-dev-api
 
 **"Lambda package not found"**
 - Ensure Docker is running
-- Run `cd backend && uv run python deploy.py` manually
+- Run `cd backend && uv run deploy.py` manually
 
 **"S3 bucket already exists"**
 - Bucket names must be globally unique

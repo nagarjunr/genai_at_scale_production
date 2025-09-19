@@ -418,9 +418,9 @@ Your Lambda function needs permission to call Bedrock:
 Since we changed requirements.txt, we need to install dependencies and rebuild the deployment package:
 
 ```bash
-cd twin/backend
+cd backend
 uv add -r requirements.txt
-uv run python deploy.py
+uv run deploy.py
 ```
 
 This creates a new `lambda-deployment.zip` with the updated dependencies.
@@ -433,7 +433,6 @@ We'll upload your code via S3, which is more reliable for larger packages and sl
 
 ```bash
 # Load environment variables
-cd twin
 source .env
 
 # Navigate to backend
@@ -460,11 +459,10 @@ aws s3 rm s3://$DEPLOY_BUCKET/lambda-deployment.zip
 aws s3 rb s3://$DEPLOY_BUCKET
 ```
 
-**Windows (PowerShell):**
+**Windows (PowerShell): starting in the project root**
 
 ```powershell
 # Load environment variables
-cd twin
 Get-Content .env | ForEach-Object {
     if ($_ -match '^([^=]+)=(.*)$') {
         [System.Environment]::SetEnvironmentVariable($matches[1], $matches[2], 'Process')

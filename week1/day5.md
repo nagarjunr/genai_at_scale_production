@@ -561,7 +561,7 @@ Enter:
   - **Pick the closest region for best performance!**
 - Default output format: `json`
 
-**Important**: Remember your region choice - you'll use it throughout this guide!
+**Important**: Remember your region choice - you'll use it throughout this course!
 
 ### Step 3: Push Image to ECR
 

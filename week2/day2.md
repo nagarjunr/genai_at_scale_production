@@ -77,6 +77,8 @@ Communication style:
 
 ### Step 3: Create a LinkedIn PDF
 
+Please note: recently, LinkedIn has started to limit which kinds of account can export their profile as a PDF. If this feature isn't available to you, simply print your profile to PDF, or use a PDF resume instead.
+
 Save your LinkedIn profile as a PDF:
 1. Go to your LinkedIn profile
 2. Click "More" → "Save to PDF"
@@ -396,7 +398,13 @@ uv add -r requirements.txt
 uv run uvicorn server:app --reload
 ```
 
-Test your enhanced twin at `http://localhost:3000` - it should now have much richer context!
+If you stopped your frontend then start it again:  
+
+1. Open a new terminal
+2. `cd frontend`
+3. `npm run dev`
+
+Then test your enhanced twin at `http://localhost:3000` - it should now have much richer context!
 
 ## Part 2: Set Up AWS Environment
 
@@ -540,7 +548,7 @@ Make sure Docker Desktop is running, then:
 
 ```bash
 cd backend
-uv run python deploy.py
+uv run deploy.py
 ```
 
 This creates `lambda-deployment.zip` containing your Lambda function and all dependencies.

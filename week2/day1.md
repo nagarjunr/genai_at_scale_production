@@ -112,7 +112,7 @@ After installation, close and reopen your terminal, then verify:
 uv --version
 ```
 
-You should see a version number like `uv 0.5.0` or similar.
+You should see a version number like `uv 0.8.18` or similar.
 
 ## Part 3: Create the Backend API
 
@@ -138,6 +138,14 @@ CORS_ORIGINS=http://localhost:3000
 ```
 
 Replace `your_openai_api_key_here` with your actual OpenAI API key from Week 1.
+
+Remember to Save the file!
+
+Also, it's a good practice in case you ever decide to push this repo to github:
+
+1. Create a new file called .gitignore in the project root (twin)
+2. Add a single line with ".env" in it
+3. Save
 
 ### Step 3: Create Your Digital Twin's Personality
 
