@@ -38,6 +38,24 @@ Before we start, let's understand the AWS services:
 
 ## Part 1: Create Your AWS Account
 
+## WAIT - HEADS UP - DISCOVERY SINCE GOING TO PRESS!
+
+There's an option for first time users of AWS to select the "free tier" of AWS. Don't choose this! It only has limited access to AWS services, including no access to App Runner (the service we use today). This doesn't mean that you need to pay a subscription or pay for support; just that you need to enter payment details and not be on a completely free plan.
+
+This was discovered brilliantly by student Andy C. who shared:
+
+> **Cryptic App Runner service error message: "The AWS Access Key Id needs a subscription for the service"**  
+> 
+> I struggled with this message for 24 hours and wanted to let everyone know the root cause. I get it when (1) I try to set up a new "Auto scaling" config (e.g., "Basic" that Ed suggests) and (2) when I try to save and create my app runner service.
+>
+> Here was the problem: I was signed up for the free tier of AWS. Apparently the free tier does not allow for you to use App Runner. Argh. Once I upgraded to paid tier, I was golden.
+> 
+> I tried so many other things to try to fix this issue and spent hours trying to understand IAM, thinking that was the problem. I hope this message saves someone else a huge amount of time!
+
+This is an example of the kind of infrastructure horrors you may face - and with enormous appreciation to Andy for digging in, finding the root cause and sharing with us all.
+
+With that in mind:
+
 ### Step 1: Sign Up for AWS
 
 1. Visit [aws.amazon.com](https://aws.amazon.com)
