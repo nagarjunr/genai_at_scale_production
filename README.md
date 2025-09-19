@@ -11,7 +11,7 @@ I could not be more excited to welcome you to my juiciest course yet!!
 ### Major links
 
 - The [course itself on Udemy](https://edwarddonner.com/2025/05/28/connecting-my-courses-become-an-llm-expert-and-leader/)  - this has links to this course, and my companion courses on on LLM Engineering, Agentic AI, and LLMs for Leaders
-- The [extra course resources](https://edwarddonner.com/2025/09/15/ai-in-production-gen-ai-and-agentic-ai-on-aws-at-scale/) on my website
+- The [extra course resources](https://edwarddonner.com/2025/09/15/ai-in-production-gen-ai-and-agentic-ai-on-aws-at-scale/) on my website including the slides
 
 ### Before you begin
 
