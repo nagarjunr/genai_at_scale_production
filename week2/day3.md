@@ -179,7 +179,7 @@ app.add_middleware(
 # Initialize Bedrock client
 bedrock_client = boto3.client(
     service_name="bedrock-runtime", 
-    region_name=os.getenv("AWS_REGION", "us-east-1")
+    region_name=os.getenv("DEFAULT_AWS_REGION", "us-east-1")
 )
 
 # Bedrock model selection
@@ -399,7 +399,7 @@ if __name__ == "__main__":
 3. Go to **Configuration** → **Environment variables**
 4. Click **Edit**
 5. Add these new variables:
-   - Key: `AWS_REGION` | Value: `us-east-1` (or your region)
+   - Key: `DEFAULT_AWS_REGION` | Value: `us-east-1` (or your region)
    - Key: `BEDROCK_MODEL_ID` | Value: `amazon.nova-lite-v1:0`
 6. You can now remove `OPENAI_API_KEY` since we're not using it
 7. Click **Save**
