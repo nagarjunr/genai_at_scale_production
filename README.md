@@ -23,7 +23,7 @@ I'm also trying out X at [@edwarddonner](https://x.com/edwarddonner) - if you're
 
 - Each week of the course gets its own folder; start in the week1 folder and pick day1.md
 - There are many essential guides in the [guides](guides/01_intro.ipynb) section
-- Please `git pull` frequently to get the latest updates - see (Guide 3 in the Guides folder)[guides/03_git_and_github.ipynb] on how to pull.
+- Please `git pull` frequently to get the latest updates - see [Guide 3 in the Guides folder](guides/03_git_and_github.ipynb) on how to pull.
 
 
 ### The deal you made
