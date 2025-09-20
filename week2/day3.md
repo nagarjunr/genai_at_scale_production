@@ -4,6 +4,14 @@
 
 Welcome to Day 3! Today, we're making a significant architectural shift - replacing OpenAI with AWS Bedrock for AI responses. This change brings several advantages: lower latency (requests stay within AWS), potential cost savings, and deeper integration with AWS services. You'll learn how enterprise applications leverage cloud-native AI services for production deployments.
 
+## HEADS UP: Something important to watch out for -
+
+In Bedrock, models aren't always available in every region.  
+When you're choosing the model to use below, it's possible that you'll need to change the region (top right of the console) to either `us-west-2` or `us-east-1` to find the model you want. You'll need to match that AWS region in the code.  
+Remember to change the region back to your local region when looking at other AWS services. The Bedrock model doesn't need to run in the same region as the rest of your infrastructure..
+
+Thank you to Andy C (again) for making this important point!
+
 ## What You'll Learn Today
 
 - **AWS Bedrock fundamentals** - Amazon's managed AI service
@@ -82,7 +90,7 @@ Your TwinAccess group now has these policies:
 1. In the left sidebar, click **Model access** (under Foundation models)
 2. Click **Manage model access** or **Enable specific models** button
 3. Find the **Amazon** section
-4. Check the boxes for:
+4. Check the boxes for these models. _Note that you might need to change region (top right) if these models aren't available._  
    - ✅ Nova Micro
    - ✅ Nova Lite  
    - ✅ Nova Pro
