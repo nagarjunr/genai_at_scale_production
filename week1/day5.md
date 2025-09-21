@@ -40,7 +40,7 @@ Before we start, let's understand the AWS services:
 
 ## WAIT - HEADS UP - DISCOVERY SINCE GOING TO PRESS!
 
-There's an option for first time users of AWS to select the "free tier" of AWS. Don't choose this! It only has limited access to AWS services, including no access to App Runner (the service we use today). This doesn't mean that you need to pay a subscription or pay for support; just that you need to enter payment details and not be on a completely free plan.
+There's an option for first time users of AWS to select the "free tier" of AWS. Don't choose this! It only has limited access to AWS services, including no access to App Runner (the service we use today). This doesn't mean that you need to pay a subscription or pay for support; just that you need to enter payment details and not be in a sandbox environment. Student Jake C. confirmed that $120 free credits still applied even after signing up for a full account.
 
 This was discovered brilliantly by student Andy C. who shared:
 
