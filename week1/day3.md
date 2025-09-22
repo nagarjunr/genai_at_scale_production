@@ -353,6 +353,8 @@ vercel --prod
 
 Visit your production URL and test the complete authentication flow!
 
+NOTE - if you hit a problem with jwt token expiration, please see this [fix contributed by Artur P](../community_contributions/arturp_jwt_token_fix_notes.md)
+
 ## What's Happening?
 
 Your app now has:
