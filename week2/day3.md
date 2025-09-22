@@ -71,6 +71,9 @@ Your TwinAccess group now has these policies:
 - IAMReadOnlyAccess
 - **AmazonBedrockFullAccess** (new!)
 - **CloudWatchFullAccess** (new!)
+- **AmazonDynamoDBFullAccess** (VERY new!)
+
+That last entry was a catch by student Andy C (thanks once again Andy) - without this, you may get a permissions error in Day 5.
 
 ### Step 3: Sign Back In as IAM User
 

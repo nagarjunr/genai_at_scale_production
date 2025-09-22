@@ -141,10 +141,13 @@ We'll create a reusable permission group first, then add our user to it:
    - `AmazonEC2ContainerRegistryFullAccess` - to store Docker images
    - `CloudWatchLogsFullAccess` - to view logs
    - `IAMUserChangePassword` - to manage own credentials
+   - IMPORTANT: also `IAMFullAccess` - I don't think I mention this in the video, but it must be included or you will get errors later! Thank you Anthony W and Jake C for pointing this out.
 5. Click **Create user group**
 6. Back on the permissions page, select the `BroadAIEngineerAccess` group (it should be checked)
 7. Click **Next** → **Create user**
 8. **Important**: Click **Download .csv file** and save it securely!
+
+It's worth keeping in mind that you might get permissions errors thoughout the course, when AWS complains that your user doesn't have permission to do something. The solution is usually to come back to this screen (as the root user) and attach another policy! This is a very common chore working with AWS...
 
 ### Step 6: Sign In as IAM User
 
