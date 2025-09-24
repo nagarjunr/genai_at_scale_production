@@ -844,14 +844,9 @@ if (-not (terraform workspace list | Select-String $Environment)) {
 }
 
 if ($Environment -eq "prod") {
-    terraform apply -var-file=prod.tfvars `
-                    -var="project_name=$ProjectName" `
-                    -var="environment=$Environment" `
-                    -auto-approve
+    terraform apply -var-file=prod.tfvars -var="project_name=$ProjectName" -var="environment=$Environment" -auto-approve
 } else {
-    terraform apply -var="project_name=$ProjectName" `
-                    -var="environment=$Environment" `
-                    -auto-approve
+    terraform apply -var="project_name=$ProjectName" -var="environment=$Environment" -auto-approve
 }
 
 $ApiUrl        = terraform output -raw api_gateway_url
@@ -1108,14 +1103,9 @@ Write-Host "Running terraform destroy..." -ForegroundColor Yellow
 
 # Run terraform destroy with auto-approve
 if ($Environment -eq "prod" -and (Test-Path "prod.tfvars")) {
-    terraform destroy -var-file=prod.tfvars `
-                     -var="project_name=$ProjectName" `
-                     -var="environment=$Environment" `
-                     -auto-approve
+    terraform destroy -var-file=prod.tfvars -var="project_name=$ProjectName" -var="environment=$Environment" -auto-approve
 } else {
-    terraform destroy -var="project_name=$ProjectName" `
-                     -var="environment=$Environment" `
-                     -auto-approve
+    terraform destroy -var="project_name=$ProjectName" -var="environment=$Environment" -auto-approve
 }
 
 Write-Host "Infrastructure for $Environment has been destroyed!" -ForegroundColor Green
