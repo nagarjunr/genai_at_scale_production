@@ -782,24 +782,6 @@ ls ../memory/
 
 You'll see files like `abc123-def456-....json` containing the full conversation history.
 
-### Step 4: Test Persistent Memory
-
-To truly test persistence:
-
-1. Stop both servers (Ctrl+C in both terminals)
-2. Restart the backend:
-   ```bash
-   cd backend
-   uv run uvicorn server:app --reload
-   ```
-3. Restart the frontend:
-   ```bash
-   cd frontend
-   npm run dev
-   ```
-4. Go back to `http://localhost:3000`
-5. Your conversation history is preserved in the UI!
-
 ## Understanding What We Built
 
 ### The Architecture
