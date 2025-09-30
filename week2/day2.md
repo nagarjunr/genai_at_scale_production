@@ -1001,7 +1001,6 @@ This allows your Lambda function to accept requests only from your CloudFront di
 1. Go to your CloudFront URL: `https://YOUR-DISTRIBUTION.cloudfront.net`
 2. Your Digital Twin should load with HTTPS!
 3. Test the chat functionality
-4. Verify memory persists across conversations
 
 ### Step 2: Verify Memory in S3
 
