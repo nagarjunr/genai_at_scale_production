@@ -12,6 +12,20 @@ Remember to change the region back to your local region when looking at other AW
 
 Thank you to Andy C (again) for making this important point!
 
+## Another HEADS UP: model name
+
+During this project, we will use Bedrock model ids like this:  
+`amazon.nova-lite-v1:0`
+
+Depending on which region you're running in, and the Bedrock region, this might give you an error. You might find that you need to use something called an "inference profile", particularly if your default region is different to the Bedrock region. It's an easy change: you just change your Bedrock model id to have a prefix like this:
+
+`us.amazon.nova-lite-v1:0`  
+or
+`eu.amazon.nova-lite-v1:0`  
+(people in AP should be fine to use either)
+
+So if you have a Bedrock error, please try adding the "us." or "eu." prefix! Thank you to Susan M. for pointing this out.
+
 ## What You'll Learn Today
 
 - **AWS Bedrock fundamentals** - Amazon's managed AI service
@@ -190,6 +204,7 @@ bedrock_client = boto3.client(
 # - amazon.nova-micro-v1:0  (fastest, cheapest)
 # - amazon.nova-lite-v1:0   (balanced - default)
 # - amazon.nova-pro-v1:0    (most capable, higher cost)
+# Remember the Heads up: you might need to add us. or eu. prefix to the below model id
 BEDROCK_MODEL_ID = os.getenv("BEDROCK_MODEL_ID", "amazon.nova-lite-v1:0")
 
 # Memory storage configuration
@@ -403,13 +418,13 @@ if __name__ == "__main__":
 4. Click **Edit**
 5. Add these new variables:
    - Key: `DEFAULT_AWS_REGION` | Value: `us-east-1` (or your region)
-   - Key: `BEDROCK_MODEL_ID` | Value: `amazon.nova-lite-v1:0`
+   - Key: `BEDROCK_MODEL_ID` | Value: `amazon.nova-lite-v1:0` and remember that this might need a "us." or "eu." prefix if you get a Bedrock error  
 6. You can now remove `OPENAI_API_KEY` since we're not using it
 7. Click **Save**
 
 ### Model ID Options
 
-You can change `BEDROCK_MODEL_ID` to any of these:
+You can change `BEDROCK_MODEL_ID` to any of these, and you might need to add the "us." or "eu." prefix, as described in the Heads Up at the top:  
 - `amazon.nova-micro-v1:0` - Fastest and cheapest
 - `amazon.nova-lite-v1:0` - Balanced (recommended)
 - `amazon.nova-pro-v1:0` - Most capable but more expensive
