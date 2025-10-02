@@ -87,11 +87,19 @@ Leave this server running, and open a new Terminal in Cursor, and send in a mess
 
 ### Step 5 - deploy!
 
-This is the big command:
+Here is the big command - but also please see the super-valuable heads up from student Andy C. below.
 
-`uv run agentcore configure -e first.py`
+`uv run agentcore configure -e first.py`  
+and pick all the defaults.
 
-Pick all the defaults. Then:
+NOTE FROM ANDY C.:
+
+> My default aws region is set for "us-east-2" but the Claude model we're using is only available in "us-west-2". This caused a number of different errors when trying to deploy the AgentCore suite. This can easily be corrected with a flag that points to the model's region:  
+> `uv run agentcore configure -e first.py --region us-west-2`  
+> Once I did that, everything in the AgentCore lesson went without a hitch. It was so fun and easy!
+
+
+After you run the command (my one, or use Andy's flag if your Bedrock is in a different region):  
 
 `uv run agentcore launch`
 
