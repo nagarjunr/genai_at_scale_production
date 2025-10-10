@@ -12,7 +12,9 @@ Remember to change the region back to your local region when looking at other AW
 
 Thank you to Andy C (again) for making this important point!
 
-## Another HEADS UP: model name
+## Another important heads up:
+
+## Bedrock, model names, regions and inference profiles - please read
 
 During this project, we will use Bedrock model ids like this:  
 `amazon.nova-lite-v1:0`
@@ -25,6 +27,14 @@ or
 (people in AP should be fine to use either)
 
 So if you have a Bedrock error, please try adding the "us." or "eu." prefix! Thank you to Susan M. for pointing this out.
+
+AND there's one additional technicality associated with this! This is quite a bore, but when you use these "inference profiles", you need to ensure that you have permission to access the model in all the related Bedrock Regions, from the Bedrock screens that we cover today.
+
+So if you choose `us.amazon.nova-lite-v1:0` then you need permission to access Nova models in each of: us-east-1, us-east-2, us-west-2
+
+And if you choose `eu.amazon.nova-lite-v1:0` then you need permission to access Nova mnodels in each of: eu-central-1, eu-north-1, eu-west-1, eu-west-3
+
+Phew! If you don't request the relevant Bedrock regions, then you may see a permissions error at some point, and you'd need to come to Bedrock in the console and fix this. Quite tiresome!
 
 ## What You'll Learn Today
 

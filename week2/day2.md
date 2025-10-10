@@ -436,12 +436,13 @@ Replace `your_aws_account_id` with your actual AWS account ID (12 digits).
 1. In AWS Console, search for **IAM**
 2. Click **User groups** → **Create group**
 3. Group name: `TwinAccess`
-4. Attach the following policies:
+4. Attach the following policies - IMPORTANT see the last one added in to avoid permission issues later!  
    - `AWSLambda_FullAccess` - For Lambda operations
    - `AmazonS3FullAccess` - For S3 bucket operations
    - `AmazonAPIGatewayAdministrator` - For API Gateway
    - `CloudFrontFullAccess` - For CloudFront distribution
    - `IAMReadOnlyAccess` - To view roles
+   - `AmazonDynamoDBFullAccess_v2` - Needed on Day 4
 5. Click **Create group**
 
 ### Step 4: Add User to Group
