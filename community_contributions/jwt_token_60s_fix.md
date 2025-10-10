@@ -4,6 +4,8 @@ The original implementation of long-running Server-Sent Events (SSE) had an issu
 
 # Fix description
 
+See file `product.tsx` in this folder for the fix.
+
 This fix introduces robust token refresh and connection management logic to prevent session failures. The updated process seamlessly handles expired tokens by automatically re-establishing the SSE connection with a new JWT, ensuring an uninterrupted user experience.
 
 Enhancements include::

@@ -18,6 +18,11 @@ An authenticated version of your app that:
 - Completed Day 2 (working Business Idea Generator)
 - Your project deployed to Vercel
 
+## IMPORTANT Note - added since the videos
+
+In some situations, if your app takes longer than 60 seconds to respond to a request, it's possible that you experience a Timeout error. You'll see in the browser's Javascript Console that you're getting a 403 error. The fix for this is in community_contributions explained in the file jwt_token_60s_fix.md. Look out for this 403 timeout after 60 seconds, and if it happens, please see the fix. Thanks!
+
+
 ## Part 1: User Authentication
 
 ### Step 1: Create Your Clerk Account
