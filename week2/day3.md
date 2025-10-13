@@ -32,7 +32,7 @@ AND there's one additional technicality associated with this! This is quite a bo
 
 So if you choose `us.amazon.nova-lite-v1:0` then you need permission to access Nova models in each of: us-east-1, us-east-2, us-west-2
 
-And if you choose `eu.amazon.nova-lite-v1:0` then you need permission to access Nova mnodels in each of: eu-central-1, eu-north-1, eu-west-1, eu-west-3
+And if you choose `eu.amazon.nova-lite-v1:0` then you need permission to access Nova models in each of: eu-central-1, eu-north-1, eu-west-1, eu-west-3
 
 Phew! If you don't request the relevant Bedrock regions, then you may see a permissions error at some point, and you'd need to come to Bedrock in the console and fix this. Quite tiresome!
 
