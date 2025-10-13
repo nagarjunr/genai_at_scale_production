@@ -300,7 +300,7 @@ output "dynamodb_table_name" {
 }
 ```
 
-### Step 2: Create Backend Resources
+### Step 2: Create Backend Resources - note 1 line is different for Mac/Linux or PC:
 
 ```bash
 cd terraform
@@ -311,8 +311,12 @@ terraform workspace select default
 # Initialize Terraform
 terraform init
 
-# Apply just the backend resources (one line - copy and paste this entire command)
+# Apply just the backend resources (one line - copy and paste this entire command - different for Mac/Linux and PC)
+
+# Mac/Linux version:
 terraform apply -target=aws_s3_bucket.terraform_state -target=aws_s3_bucket_versioning.terraform_state -target=aws_s3_bucket_server_side_encryption_configuration.terraform_state -target=aws_s3_bucket_public_access_block.terraform_state -target=aws_dynamodb_table.terraform_locks
+# PC version
+terraform apply --% -target="aws_s3_bucket.terraform_state" -target="aws_s3_bucket_versioning.terraform_state" -target="aws_s3_bucket_server_side_encryption_configuration.terraform_state" -target="aws_s3_bucket_public_access_block.terraform_state" -target="aws_dynamodb_table.terraform_locks"
 
 # Verify the resources were created
 terraform output
