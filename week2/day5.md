@@ -762,7 +762,8 @@ Now you need to apply the resources. The command differs depending on whether th
 If the grep/Select-String command above found nothing, the OIDC provider doesn't exist yet. Create it along with the IAM role:
 
 **⚠️ IMPORTANT**: Replace `YOUR_GITHUB_USERNAME` with your actual GitHub username.
-For example: if your GitHub username is 'johndoe', use: `johndoe/digital-twin`
+For example: if your GitHub username is 'johndoe', use: `johndoe/digital-twin`  
+**NOTE** Do not put a URL here - it should just be the Github username, not with "https://github.com/" at the front, or you will get cryptic errors!
 
 **Mac/Linux:**
 ```bash
