@@ -7,6 +7,7 @@ Today you'll add enterprise-grade authentication to your Business Idea Generator
 ## What You'll Build
 
 An authenticated version of your app that:
+
 - Requires users to sign in before accessing the idea generator
 - Supports multiple authentication providers (Google, GitHub, Email)
 - Passes secure JWT tokens to your backend
@@ -22,7 +23,6 @@ An authenticated version of your app that:
 
 In some situations, if your app takes longer than 60 seconds to respond to a request, it's possible that you experience a Timeout error. You'll see in the browser's Javascript Console that you're getting a 403 error. The fix for this is in community_contributions explained in the file jwt_token_60s_fix.md. Look out for this 403 timeout after 60 seconds, and if it happens, please see the fix. Thanks!
 
-
 ## Part 1: User Authentication
 
 ### Step 1: Create Your Clerk Account
@@ -36,7 +36,7 @@ In some situations, if your app takes longer than 60 seconds to respond to a req
 1. **Application name:** SaaS
 2. **Sign-in options:** Enable these providers:
    - Email
-   - Google  
+   - Google
    - GitHub
    - Apple (optional)
 3. Click **Create Application**
@@ -97,7 +97,7 @@ Move your business idea generator to a protected route. Since we're using client
 Create `pages/product.tsx`:
 
 ```typescript
-"use client"
+'use client';
 
 import { useEffect, useState } from 'react';
 import ReactMarkdown from 'react-markdown';
@@ -107,68 +107,66 @@ import { useAuth } from '@clerk/nextjs';
 import { fetchEventSource } from '@microsoft/fetch-event-source';
 
 export default function Product() {
-    const { getToken } = useAuth();
-    const [idea, setIdea] = useState<string>('…loading');
+  const { getToken } = useAuth();
+  const [idea, setIdea] = useState<string>('…loading');
 
-    useEffect(() => {
-        let buffer = '';
-        (async () => {
-            const jwt = await getToken();
-            if (!jwt) {
-                setIdea('Authentication required');
-                return;
-            }
-            
-            await fetchEventSource('/api', {
-                headers: { Authorization: `Bearer ${jwt}` },
-                onmessage(ev) {
-                    buffer += ev.data;
-                    setIdea(buffer);
-                },
-                onerror(err) {
-                    console.error('SSE error:', err);
-                    // Don't throw - let it retry
-                }
-            });
-        })();
-    }, []); // Empty dependency array - run once on mount
+  useEffect(() => {
+    let buffer = '';
+    (async () => {
+      const jwt = await getToken();
+      if (!jwt) {
+        setIdea('Authentication required');
+        return;
+      }
 
-    return (
-        <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
-            <div className="container mx-auto px-4 py-12">
-                {/* Header */}
-                <header className="text-center mb-12">
-                    <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
-                        Business Idea Generator
-                    </h1>
-                    <p className="text-gray-600 dark:text-gray-400 text-lg">
-                        AI-powered innovation at your fingertips
-                    </p>
-                </header>
+      await fetchEventSource('/api', {
+        headers: { Authorization: `Bearer ${jwt}` },
+        onmessage(ev) {
+          buffer += ev.data;
+          setIdea(buffer);
+        },
+        onerror(err) {
+          console.error('SSE error:', err);
+          // Don't throw - let it retry
+        },
+      });
+    })();
+  }, []); // Empty dependency array - run once on mount
 
-                {/* Content Card */}
-                <div className="max-w-3xl mx-auto">
-                    <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 backdrop-blur-lg bg-opacity-95">
-                        {idea === '…loading' ? (
-                            <div className="flex items-center justify-center py-12">
-                                <div className="animate-pulse text-gray-400">
-                                    Generating your business idea...
-                                </div>
-                            </div>
-                        ) : (
-                            <div className="markdown-content text-gray-700 dark:text-gray-300">
-                                <ReactMarkdown
-                                    remarkPlugins={[remarkGfm, remarkBreaks]}
-                                >
-                                    {idea}
-                                </ReactMarkdown>
-                            </div>
-                        )}
-                    </div>
+  return (
+    <main className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 dark:from-gray-900 dark:to-gray-800">
+      <div className="container mx-auto px-4 py-12">
+        {/* Header */}
+        <header className="text-center mb-12">
+          <h1 className="text-5xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent mb-4">
+            Business Idea Generator
+          </h1>
+          <p className="text-gray-600 dark:text-gray-400 text-lg">
+            AI-powered innovation at your fingertips
+          </p>
+        </header>
+
+        {/* Content Card */}
+        <div className="max-w-3xl mx-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-8 backdrop-blur-lg bg-opacity-95">
+            {idea === '…loading' ? (
+              <div className="flex items-center justify-center py-12">
+                <div className="animate-pulse text-gray-400">
+                  Generating your business idea...
                 </div>
-            </div>
-        </main>
-    );
+              </div>
+            ) : (
+              <div className="markdown-content text-gray-700 dark:text-gray-300">
+                <ReactMarkdown remarkPlugins={[remarkGfm, remarkBreaks]}>
+                  {idea}
+                </ReactMarkdown>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    </main>
+  );
 }
 ```
 
@@ -177,7 +175,7 @@ export default function Product() {
 Update `pages/index.tsx` to be your new landing page with sign-in:
 
 ```typescript
-"use client"
+'use client';
 
 import Link from 'next/link';
 import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
@@ -201,8 +199,8 @@ export default function Home() {
             </SignedOut>
             <SignedIn>
               <div className="flex items-center gap-4">
-                <Link 
-                  href="/product" 
+                <Link
+                  href="/product"
                   className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded-lg transition-colors"
                 >
                   Go to App
@@ -221,9 +219,10 @@ export default function Home() {
             Big Business Idea
           </h2>
           <p className="text-xl text-gray-600 dark:text-gray-400 mb-12 max-w-2xl mx-auto">
-            Harness the power of AI to discover innovative business opportunities tailored for the AI agent economy
+            Harness the power of AI to discover innovative business
+            opportunities tailored for the AI agent economy
           </p>
-          
+
           <SignedOut>
             <SignInButton mode="modal">
               <button className="bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold py-4 px-8 rounded-xl text-lg transition-all transform hover:scale-105">
@@ -248,14 +247,70 @@ export default function Home() {
 ### Step 8: Configure Backend Authentication
 
 First, get your JWKS URL from Clerk:
+
 1. Go to your Clerk Dashboard
 2. Click **Configure** (top nav)
-3. Click **API Keys** (side nav)  
+3. Click **API Keys** (side nav)
 4. Find **JWKS URL** and copy it
+
+## JWKS Authentication Flow - Detailed Explanation
+
+### How JWT Verification Works with JWKS
+
+1. **User Authentication (Frontend)**
+
+- User signs in through Clerk's authentication UI
+- Clerk validates credentials and generates a JWT token
+- JWT contains user claims (id, email, etc.) and is digitally signed using Clerk's private key
+- This token is sent to the client application
+
+2. **Token Structure**
+
+- **Header**: Contains token type (JWT) and signing algorithm (e.g., RS256)
+- **Payload**: Contains user claims and metadata (subject, expiration, issuer)
+- **Signature**: Cryptographic signature created using Clerk's private key
+
+3. **Backend Request Flow**
+
+- Client sends authenticated request with JWT in Authorization header: `Bearer <token>`
+- Python backend receives the request and extracts the JWT
+
+4. **JWKS Discovery & Caching**
+
+- Backend fetches public keys from JWKS endpoint (typically once, then cached)
+- JWKS URL example: `https://<your-clerk-instance>.clerk.accounts.dev/.well-known/jwks.json`
+- Response contains multiple public keys (for key rotation support)
+- Keys include: key ID (kid), algorithm, modulus (n), exponent (e)
+
+5. **Token Verification Process**
+
+- Backend decodes JWT header to find the key ID (kid)
+- Matches kid with corresponding public key from JWKS
+- Uses public key to verify the signature mathematically
+- Checks token expiration (exp claim) and issuer (iss claim)
+- Validates audience (aud claim) matches your application
+
+6. **Cryptographic Security**
+
+- Uses asymmetric encryption (RSA or ECDSA)
+- Private key (held by Clerk) signs tokens
+- Public key (from JWKS) verifies signatures
+- Tampering with token invalidates signature
+- No shared secrets needed between frontend and backend
+
+7. **Performance Benefits**
+
+- No network call to Clerk for each request
+- Verification happens locally using cached public keys
+- Stateless authentication - backend doesn't need session storage
+- Horizontal scaling without shared session state
+
+### Example Python Implementation
 
 **What is JWKS?** The JWKS (JSON Web Key Set) URL is a public endpoint that contains Clerk's public keys. When a user signs in, Clerk creates a JWT (JSON Web Token) - a digitally signed token that proves the user's identity. Your Python backend uses the JWKS URL to fetch Clerk's public keys and verify that incoming JWT tokens are genuine and haven't been tampered with. This allows secure authentication without your backend needing to contact Clerk for every request - it can verify tokens independently using cryptographic signatures.
 
 Add to `.env.local`:
+
 ```bash
 CLERK_JWKS_URL=your_jwks_url_here
 ```
@@ -290,12 +345,12 @@ clerk_guard = ClerkHTTPBearer(clerk_config)
 @app.get("/api")
 def idea(creds: HTTPAuthorizationCredentials = Depends(clerk_guard)):
     user_id = creds.decoded["sub"]  # User ID from JWT - available for future use
-    # We now know which user is making the request! 
+    # We now know which user is making the request!
     # You could use user_id to:
     # - Track usage per user
     # - Store generated ideas in a database
     # - Apply user-specific limits or customization
-    
+
     client = OpenAI()
     prompt = [{"role": "user", "content": "Reply with a new business idea for AI Agents, formatted with headings, sub-headings and bullet points"}]
     stream = client.chat.completions.create(model="gpt-5-nano", messages=prompt, stream=True)
@@ -320,16 +375,19 @@ Add your Clerk keys to Vercel:
 ```bash
 vercel env add NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY
 ```
+
 Paste your publishable key and select all environments.
 
 ```bash
 vercel env add CLERK_SECRET_KEY
 ```
+
 Paste your secret key and select all environments.
 
 ```bash
 vercel env add CLERK_JWKS_URL
 ```
+
 Paste your JWKS URL and select all environments.
 
 ### Step 12: Test Locally
@@ -343,6 +401,7 @@ vercel dev
 **Note:** The Python backend won't work locally with `vercel dev`, but the authentication flow will work perfectly! You'll be able to sign in, sign out, and see the user interface.
 
 Visit `http://localhost:3000` and:
+
 1. Click "Sign In"
 2. Create an account or sign in with Google/GitHub
 3. You'll be redirected to the landing page, now authenticated
@@ -363,6 +422,7 @@ NOTE - if you hit a problem with jwt token expiration, please see this [fix cont
 ## What's Happening?
 
 Your app now has:
+
 - **Secure authentication**: Users must sign in to access your product
 - **Client-side route protection**: Unauthenticated users are redirected from protected pages
 - **JWT verification**: Every API request is verified using cryptographic signatures
@@ -385,21 +445,25 @@ This architecture keeps your Next.js deployment simple (static/client-side only)
 ## Troubleshooting
 
 ### "Unauthorized" errors
+
 - Check that all three environment variables are set correctly in Vercel
 - Ensure the JWKS URL is copied correctly from Clerk
 - Verify you're signed in before accessing `/product`
 
 ### Sign-in modal not appearing
+
 - Check that `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY` starts with `pk_`
 - Ensure you've wrapped your app with `ClerkProvider`
 - Clear browser cache and cookies
 
 ### API not authenticating
+
 - Verify `CLERK_JWKS_URL` is set in your environment
 - Check that `fastapi-clerk-auth` is in requirements.txt
 - Ensure the JWT token is being sent in the Authorization header
 
 ### Local development issues
+
 - Make sure `.env.local` has all three Clerk variables
 - Restart your dev server after adding environment variables
 - Try clearing Next.js cache: `rm -rf .next`
@@ -407,6 +471,7 @@ This architecture keeps your Next.js deployment simple (static/client-side only)
 ## Next Steps
 
 Congratulations! You've added professional authentication to your SaaS. In Part 2, we'll add:
+
 - Subscription tiers with Stripe
 - Usage limits based on subscription level
 - Payment processing

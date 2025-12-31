@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JWT and JWKS Authentication - Deep Dive</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      :root {
+        --primary-color: #2563eb;
+        --secondary-color: #1e40af;
+        --success-color: #059669;
+        --danger-color: #dc2626;
+        --bg-color: #f8fafc;
+        --text-color: #1e293b;
+        --border-color: #e2e8f0;
+        --code-bg: #f1f5f9;
+        --sidebar-width: 280px;
+      }
+
+      body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+          'Helvetica Neue', Arial, sans-serif;
+        line-height: 1.7;
+        color: var(--text-color);
+        background: var(--bg-color);
+      }
+
+      .container {
+        display: flex;
+        min-height: 100vh;
+      }
+
+      /* Sidebar Navigation */
+      .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: var(--sidebar-width);
+        height: 100vh;
+        background: white;
+        border-right: 1px solid var(--border-color);
+        overflow-y: auto;
+        padding: 2rem 1.5rem;
+        z-index: 100;
+      }
+
+      .sidebar h1 {
+        font-size: 1.25rem;
+        color: var(--primary-color);
+        margin-bottom: 0.5rem;
+      }
+
+      .sidebar .subtitle {
+        font-size: 0.875rem;
+        color: #64748b;
+        margin-bottom: 2rem;
+      }
+
+      .sidebar nav ul {
+        list-style: none;
+      }
+
+      .sidebar nav ul li {
+        margin-bottom: 0.5rem;
+      }
+
+      .sidebar nav ul li a {
+        display: block;
+        padding: 0.5rem 0.75rem;
+        color: var(--text-color);
+        text-decoration: none;
+        border-radius: 0.375rem;
+        transition: all 0.2s;
+        font-size: 0.9rem;
+      }
+
+      .sidebar nav ul li a:hover {
+        background: var(--code-bg);
+        color: var(--primary-color);
+      }
+
+      /* Main Content */
+      .main-content {
+        margin-left: var(--sidebar-width);
+        flex: 1;
+        padding: 3rem;
+        max-width: 1200px;
+      }
+
+      /* Typography */
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        color: var(--text-color);
+        margin-top: 2rem;
+        margin-bottom: 1rem;
+        font-weight: 700;
+      }
+
+      h1 {
+        font-size: 2.5rem;
+        border-bottom: 3px solid var(--primary-color);
+        padding-bottom: 0.5rem;
+        margin-top: 0;
+      }
+
+      h2 {
+        font-size: 2rem;
+        border-bottom: 2px solid var(--border-color);
+        padding-bottom: 0.5rem;
+        margin-top: 3rem;
+      }
+
+      h3 {
+        font-size: 1.5rem;
+        color: var(--secondary-color);
+      }
+
+      h4 {
+        font-size: 1.25rem;
+      }
+
+      p {
+        margin-bottom: 1rem;
+      }
+
+      /* Lists */
+      ul,
+      ol {
+        margin-left: 2rem;
+        margin-bottom: 1rem;
+      }
+
+      li {
+        margin-bottom: 0.5rem;
+      }
+
+      /* Code Blocks */
+      code {
+        background: var(--code-bg);
+        padding: 0.2rem 0.4rem;
+        border-radius: 0.25rem;
+        font-family: 'Monaco', 'Courier New', monospace;
+        font-size: 0.875rem;
+        color: #e11d48;
+      }
+
+      pre {
+        background: var(--code-bg);
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+        margin: 1.5rem 0;
+        border: 1px solid var(--border-color);
+      }
+
+      pre code {
+        background: none;
+        padding: 0;
+        color: var(--text-color);
+        font-size: 0.875rem;
+        line-height: 1.6;
+      }
+
+      /* Tables */
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 1.5rem 0;
+        background: white;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      }
+
+      th {
+        background: var(--primary-color);
+        color: white;
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+      }
+
+      td {
+        padding: 1rem;
+        border-bottom: 1px solid var(--border-color);
+      }
+
+      tr:last-child td {
+        border-bottom: none;
+      }
+
+      /* Callout Boxes */
+      .callout {
+        padding: 1.5rem;
+        border-radius: 0.5rem;
+        margin: 1.5rem 0;
+        border-left: 4px solid;
+      }
+
+      .callout-info {
+        background: #dbeafe;
+        border-color: var(--primary-color);
+      }
+
+      .callout-success {
+        background: #d1fae5;
+        border-color: var(--success-color);
+      }
+
+      .callout-danger {
+        background: #fee2e2;
+        border-color: var(--danger-color);
+      }
+
+      .callout-title {
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      /* Icons */
+      .icon-success::before {
+        content: '✓';
+        color: var(--success-color);
+        font-weight: bold;
+      }
+
+      .icon-danger::before {
+        content: '✗';
+        color: var(--danger-color);
+        font-weight: bold;
+      }
+
+      /* Flow Diagram */
+      .flow-diagram {
+        background: white;
+        border: 1px solid var(--border-color);
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        font-family: monospace;
+        white-space: pre;
+        overflow-x: auto;
+      }
+
+      /* Links */
+      a {
+        color: var(--primary-color);
+        text-decoration: none;
+      }
+
+      a:hover {
+        text-decoration: underline;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+        .sidebar {
+          position: static;
+          width: 100%;
+          height: auto;
+          border-right: none;
+          border-bottom: 1px solid var(--border-color);
+        }
+
+        .main-content {
+          margin-left: 0;
+          padding: 1.5rem;
+        }
+
+        h1 {
+          font-size: 2rem;
+        }
+
+        h2 {
+          font-size: 1.5rem;
+        }
+      }
+
+      /* Footer */
+      .footer {
+        margin-top: 4rem;
+        padding: 2rem 0;
+        border-top: 1px solid var(--border-color);
+        color: #64748b;
+        font-size: 0.875rem;
+      }
+
+      /* Scroll Behavior */
+      html {
+        scroll-behavior: smooth;
+      }
+
+      section {
+        scroll-margin-top: 2rem;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <h1>JWT & JWKS</h1>
+        <p class="subtitle">Authentication Deep Dive</p>
+        <nav>
+          <ul>
+            <li><a href="#what-is-jwks">What is JWKS?</a></li>
+            <li><a href="#jwt-structure">JWT Structure</a></li>
+            <li><a href="#digital-signatures">Digital Signatures</a></li>
+            <li>
+              <a href="#mathematical-verification">Mathematical Verification</a>
+            </li>
+            <li><a href="#why-encryption">Why Encryption is Necessary</a></li>
+            <li><a href="#jwks-structure">JWKS Structure</a></li>
+            <li><a href="#verification-flow">Complete Verification Flow</a></li>
+            <li><a href="#security-properties">Security Properties</a></li>
+            <li><a href="#misconceptions">Common Misconceptions</a></li>
+            <li><a href="#summary">Summary</a></li>
+            <li><a href="#resources">Additional Resources</a></li>
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- Main Content -->
+      <main class="main-content">
+        <h1>JWT and JWKS Authentication - Deep Dive</h1>
+        <p style="font-size: 1.1rem; color: #64748b; margin-bottom: 2rem">
+          A comprehensive guide to understanding JSON Web Tokens, JWKS, and
+          cryptographic signatures
+        </p>
+
+        <!-- What is JWKS -->
+        <section id="what-is-jwks">
+          <h2>What is JWKS?</h2>
+          <p>
+            <strong>JWKS (JSON Web Key Set)</strong> is a standardized way to
+            distribute public cryptographic keys over the internet.
+          </p>
+
+          <h3>Purpose</h3>
+          <p>
+            The JWKS URL is a public endpoint that contains an authentication
+            provider's (like Clerk's) public keys. It enables:
+          </p>
+          <ul>
+            <li>
+              <strong>Stateless Authentication</strong>: Your backend can verify
+              JWT tokens independently
+            </li>
+            <li>
+              <strong>No Network Calls</strong>: Verification happens locally
+              using cached public keys
+            </li>
+            <li>
+              <strong>Horizontal Scaling</strong>: No shared session state
+              needed
+            </li>
+            <li>
+              <strong>Security</strong>: Cryptographic proof that tokens are
+              genuine
+            </li>
+          </ul>
+
+          <h3>The Problem JWKS Solves</h3>
+          <div class="callout callout-danger">
+            <div class="callout-title">Without JWKS:</div>
+            <ul>
+              <li>
+                Call the authentication service for every request (slow, creates
+                dependency)
+              </li>
+              <li>Share secret keys (security risk)</li>
+              <li>Maintain session storage (doesn't scale horizontally)</li>
+            </ul>
+          </div>
+
+          <div class="callout callout-success">
+            <div class="callout-title">With JWKS:</div>
+            <ul>
+              <li>Fetch public keys once and cache them</li>
+              <li>Verify tokens mathematically in milliseconds</li>
+              <li>Scale infinitely without coordination</li>
+              <li>Trust tokens without contacting the issuer</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- JWT Structure -->
+        <section id="jwt-structure">
+          <h2>JWT Structure</h2>
+          <p>A JWT consists of three Base64-encoded parts separated by dots:</p>
+          <pre><code>header.payload.signature</code></pre>
+
+          <h3>Example JWT (decoded)</h3>
+          <pre><code>// HEADER (Base64-encoded)
+{
+  "alg": "RS256",           // Signing algorithm
+  "typ": "JWT",             // Token type
+  "kid": "ins_2abc123xyz"   // Key ID (matches JWKS)
+}
+
+// PAYLOAD (Base64-encoded)
+{
+  "sub": "user_2xyz789",    // Subject (user ID)
+  "email": "user@example.com",
+  "iat": 1704067200,        // Issued at (timestamp)
+  "exp": 1704070800,        // Expiration (timestamp)
+  "iss": "https://clerk.example.com"  // Issuer
+}
+
+// SIGNATURE (Binary, then Base64-encoded)
+// This is the cryptographic signature created with private key</code></pre>
+
+          <div class="callout callout-info">
+            <div class="callout-title">Important Notes</div>
+            <ul>
+              <li>
+                <strong>JWTs are NOT encrypted</strong> - just Base64-encoded
+              </li>
+              <li>Anyone can decode and read the payload</li>
+              <li>
+                Never put sensitive data (passwords, credit cards) in JWTs
+              </li>
+              <li>The signature prevents tampering, not reading</li>
+            </ul>
+          </div>
+        </section>
+
+        <!-- Digital Signatures -->
+        <section id="digital-signatures">
+          <h2>How Digital Signatures Work</h2>
+          <p>
+            Digital signatures use <strong>asymmetric cryptography</strong> -
+            different keys for signing and verification.
+          </p>
+
+          <h3>Key Pairs</h3>
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 1rem;
+              margin: 1.5rem 0;
+            "
+          >
+            <div class="callout callout-danger">
+              <div class="callout-title">Private Key (held by Clerk)</div>
+              <ul>
+                <li>Used to <strong>sign</strong> tokens</li>
+                <li>Must be kept secret</li>
+                <li>Denoted as <code>d</code> in RSA</li>
+              </ul>
+            </div>
+            <div class="callout callout-success">
+              <div class="callout-title">Public Key (in JWKS)</div>
+              <ul>
+                <li>Used to <strong>verify</strong> signatures</li>
+                <li>Can be shared publicly</li>
+                <li>
+                  Components: <code>n</code> (modulus) and
+                  <code>e</code> (exponent)
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <h3>The Signing Process (by Clerk)</h3>
+          <pre><code>// Step 1: Create the data to sign
+const data = base64(header) + "." + base64(payload)
+
+// Step 2: Hash the data
+const hash = SHA256(data)
+// Result: e.g., "a3f2c1d5..."
+
+// Step 3: Sign the hash with private key
+const signature = (hash^d) mod n
+// This creates a unique value only Clerk can create
+
+// Step 4: Create complete JWT
+const jwt = data + "." + base64(signature)</code></pre>
+
+          <h3>The Verification Process (by your backend)</h3>
+          <pre><code># Step 1: Split the JWT
+header, payload, signature = jwt.split('.')
+
+# Step 2: Get the public key from JWKS (using kid from header)
+public_key = jwks.get_key(kid)
+n = public_key.n  # Modulus
+e = public_key.e  # Exponent (usually 65537)
+
+# Step 3: Decrypt the signature using public key
+decrypted_hash = (signature^e) mod n
+
+# Step 4: Compute hash of received data
+computed_hash = SHA256(header + "." + payload)
+
+# Step 5: Compare
+if decrypted_hash == computed_hash:
+    # ✓ Valid! Token is authentic and unmodified
+    user_id = payload['sub']
+else:
+    # ✗ Invalid! Token was tampered or forged
+    raise Unauthorized()</code></pre>
+        </section>
+
+        <!-- Mathematical Verification -->
+        <section id="mathematical-verification">
+          <h2>The Mathematical Verification Process</h2>
+
+          <h3>RSA Signature Mathematics</h3>
+          <p><strong>Signing (Private Key Operation)</strong></p>
+          <pre><code>signature = (hash^d) mod n
+
+Where:
+- hash = SHA256(header.payload)
+- d = private exponent (secret, only Clerk knows)
+- n = modulus (public, very large number)</code></pre>
+
+          <p><strong>Verification (Public Key Operation)</strong></p>
+          <pre><code>decrypted_hash = (signature^e) mod n
+
+Where:
+- signature = the signed value from JWT
+- e = public exponent (public, typically 65537)
+- n = same modulus (public)</code></pre>
+
+          <div class="callout callout-info">
+            <div class="callout-title">Mathematical Property</div>
+            <pre><code>(hash^d)^e ≡ hash (mod n)
+
+This ONLY works when d and e are the matching private/public key pair!</code></pre>
+          </div>
+
+          <h3>Example with Small Numbers (Conceptual)</h3>
+          <p style="font-style: italic; color: #64748b">
+            Note: Real RSA uses numbers with 2048+ bits
+          </p>
+          <pre><code>Let's say:
+n = 3233
+e = 17
+d = 2753  (private, only Clerk knows)
+
+Message hash = 123
+
+Signing (by Clerk):
+signature = (123^2753) mod 3233 = 855
+
+Verification (by your backend):
+decrypted = (855^17) mod 3233 = 123 ✓
+
+If attacker changes message:
+New hash = 456
+But signature is still 855
+decrypted = (855^17) mod 3233 = 123 ≠ 456 ✗</code></pre>
+
+          <h3>Why Attackers Can't Forge Signatures</h3>
+          <pre><code>// Attacker modifies payload
+const malicious_payload = { sub: "user_admin" }
+const new_hash = SHA256(header + "." + malicious_payload)
+
+// They need to find signature where:
+// (signature^e) mod n = new_hash
+
+// This requires computing:
+// signature = new_hash^d mod n
+
+// But 'd' is private! They don't know it.
+
+// Computing 'd' from 'e' and 'n' requires:
+// - Factoring n into its prime factors
+// - For 2048-bit RSA: computationally infeasible
+// - Would take billions of years with current technology</code></pre>
+        </section>
+
+        <!-- Why Encryption is Necessary -->
+        <section id="why-encryption">
+          <h2>Why Encryption is Necessary</h2>
+
+          <div class="callout callout-info">
+            <div class="callout-title">The Critical Question</div>
+            <p>
+              "If anyone can decrypt the signature with the public key, why
+              encrypt it at all? Why not just include the hash directly?"
+            </p>
+          </div>
+
+          <h3>
+            Approach 1: Including Hash Directly (INSECURE)
+            <span class="icon-danger"></span>
+          </h3>
+          <pre><code>// JWT structure: header.payload.hash
+const data = header + "." + payload
+const hash = SHA256(data)
+const jwt = data + "." + hash
+
+// Backend verification:
+const received_hash = jwt.split('.')[2]
+const computed_hash = SHA256(header + "." + payload)
+
+if (received_hash === computed_hash) {
+    // ✓ Hashes match, accept token
+}</code></pre>
+
+          <div class="callout callout-danger">
+            <div class="callout-title">The Attack:</div>
+            <pre><code>// Attacker creates malicious JWT
+const malicious = {
+  sub: "user_admin",  // Escalate to admin!
+  email: "attacker@evil.com"
+}
+
+const header = base64({alg: "RS256"})
+const payload = base64(malicious)
+
+// Compute hash - ANYONE CAN DO THIS!
+const hash = SHA256(header + "." + payload)
+
+// Create fake JWT
+const fake_jwt = header + "." + payload + "." + hash
+
+// Your backend will accept it! ✗
+// Because SHA256(header.payload) === hash</code></pre>
+          </div>
+
+          <p>
+            <strong>Problem</strong>: A hash alone only proves data integrity,
+            <strong>not authenticity</strong>. Anyone can compute a hash for any
+            data.
+          </p>
+
+          <h3>
+            Approach 2: Including Signature (SECURE)
+            <span class="icon-success"></span>
+          </h3>
+          <pre><code>// JWT structure: header.payload.signature
+const data = header + "." + payload
+const hash = SHA256(data)
+const signature = (hash^d) mod n  // Only Clerk can do this!
+const jwt = data + "." + base64(signature)
+
+// Backend verification:
+const signature = jwt.split('.')[2]
+const decrypted_hash = (signature^e) mod n
+const computed_hash = SHA256(header + "." + payload)
+
+if (decrypted_hash === computed_hash) {
+    // ✓ Valid signature, accept token
+}</code></pre>
+
+          <div class="callout callout-success">
+            <div class="callout-title">Why Attackers Fail:</div>
+            <pre><code>// Attacker creates malicious JWT
+const malicious = { sub: "user_admin" }
+const hash = SHA256(header + "." + malicious_payload)
+
+// Option 1: Include hash directly
+const fake_jwt = header + "." + payload + "." + hash
+// Backend does: (hash^e) mod n = garbage ≠ computed_hash ✗
+
+// Option 2: Try to create valid signature
+// Need: signature where (signature^e) mod n = hash
+// Requires: signature = hash^d mod n
+// But 'd' is secret! Can't compute it. ✗
+
+// Option 3: Try to find 'd' from 'e' and 'n'
+// Requires factoring n into primes
+// Computationally infeasible for 2048-bit RSA ✗</code></pre>
+          </div>
+
+          <h3>The Key Insight</h3>
+          <p>
+            The "encryption" with the private key creates a
+            <strong>mathematical proof of origin</strong>:
+          </p>
+          <ul>
+            <li>
+              <strong>Direct hash</strong>: "This is what the data hashes to"
+              (anyone can verify, anyone can create)
+            </li>
+            <li>
+              <strong>Signed hash</strong>: "This hash was sealed by Clerk's
+              private key" (anyone can verify,
+              <strong>only Clerk can create</strong>)
+            </li>
+          </ul>
+          <p>
+            The security isn't in the decryption step - it's in the fact that
+            <strong
+              >only Clerk could have created a signature that decrypts
+              correctly</strong
+            >.
+          </p>
+
+          <h3>Analogy</h3>
+          <div
+            style="
+              display: grid;
+              grid-template-columns: 1fr 1fr;
+              gap: 1rem;
+              margin: 1.5rem 0;
+            "
+          >
+            <div class="callout callout-danger">
+              <div class="callout-title">Including hash directly:</div>
+              <ul>
+                <li>Like checking "this document has 250 words"</li>
+                <li>Anyone can count words and verify</li>
+                <li>Anyone can also write a NEW 250-word document</li>
+                <li>No proof of authorship</li>
+              </ul>
+            </div>
+            <div class="callout callout-success">
+              <div class="callout-title">Including signature:</div>
+              <ul>
+                <li>Like a royal wax seal on a document</li>
+                <li>
+                  Everyone knows what the King's seal looks like (public key)
+                </li>
+                <li>Anyone can verify the seal is genuine</li>
+                <li>
+                  But <strong>only the King can create it</strong> (private key)
+                </li>
+                <li>If you change the document, the seal breaks</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- JWKS Structure -->
+        <section id="jwks-structure">
+          <h2>JWKS Structure and Contents</h2>
+
+          <h3>JWKS Endpoint Response</h3>
+          <pre><code>{
+  "keys": [
+    {
+      "use": "sig",
+      "kty": "RSA",
+      "kid": "ins_2abc123xyz",
+      "alg": "RS256",
+      "n": "xGOr-H7A2PvaFqIxJZN8kQY6R5CvnN2ZFhhK9w3xb4N0pV_QsZLj8KtGH7vY...",
+      "e": "AQAB"
+    },
+    {
+      "use": "sig",
+      "kty": "RSA",
+      "kid": "ins_2def456uvw",
+      "alg": "RS256",
+      "n": "yH2s-K8B3QwbGrJyKaP9lRZ7S6DwoO3aGiiL0x4yc5O1qW_RtaMe9LuHI8wZ...",
+      "e": "AQAB"
+    }
+  ]
+}</code></pre>
+
+          <h3>Field Descriptions</h3>
+          <table>
+            <thead>
+              <tr>
+                <th>Field</th>
+                <th>Description</th>
+                <th>Example</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><code>kty</code></td>
+                <td>Key Type</td>
+                <td>
+                  <code>"RSA"</code> or <code>"EC"</code> (Elliptic Curve)
+                </td>
+              </tr>
+              <tr>
+                <td><code>use</code></td>
+                <td>Public Key Use</td>
+                <td>
+                  <code>"sig"</code> (signature) or
+                  <code>"enc"</code> (encryption)
+                </td>
+              </tr>
+              <tr>
+                <td><code>kid</code></td>
+                <td>Key ID</td>
+                <td><code>"ins_2abc123xyz"</code> - Unique identifier</td>
+              </tr>
+              <tr>
+                <td><code>alg</code></td>
+                <td>Algorithm</td>
+                <td><code>"RS256"</code> (RSA with SHA-256)</td>
+              </tr>
+              <tr>
+                <td><code>n</code></td>
+                <td>Modulus</td>
+                <td>Base64-encoded large number (2048+ bits)</td>
+              </tr>
+              <tr>
+                <td><code>e</code></td>
+                <td>Exponent</td>
+                <td><code>"AQAB"</code> (Base64 for 65537)</td>
+              </tr>
+            </tbody>
+          </table>
+
+          <h3>RSA Key Components</h3>
+          <ul>
+            <li>
+              <strong>Modulus (n)</strong>: Very large number (typically 2048 or
+              4096 bits), product of two large prime numbers, public
+            </li>
+            <li>
+              <strong>Exponent (e)</strong>: Almost always 65537 (0x010001),
+              represented as <code>"AQAB"</code> in Base64, public
+            </li>
+            <li>
+              <strong>Private Exponent (d)</strong>: Secret, never shared, only
+              known to the token issuer, required to create signatures
+            </li>
+          </ul>
+
+          <h3>Multiple Keys (Key Rotation)</h3>
+          <pre><code>1. Clerk generates new key pair
+2. Adds new public key to JWKS (with new kid)
+3. Starts signing new tokens with new key
+4. Old tokens still verify (old key still in JWKS)
+5. After grace period, removes old key from JWKS</code></pre>
+
+          <p>Your backend must:</p>
+          <ul>
+            <li>Cache JWKS but allow refreshing</li>
+            <li>Match JWT's <code>kid</code> with correct key from JWKS</li>
+            <li>Re-fetch JWKS if <code>kid</code> not found (new key added)</li>
+          </ul>
+        </section>
+
+        <!-- Complete Verification Flow -->
+        <section id="verification-flow">
+          <h2>Complete Verification Flow</h2>
+
+          <h3>Step-by-Step Process</h3>
+          <div class="flow-diagram">
+            ┌─────────────────────────────────────────────────────────────┐ │ 1.
+            USER SIGNS IN (Frontend) │
+            ├─────────────────────────────────────────────────────────────┤ │
+            User → Clerk Authentication UI │ │ Clerk validates credentials │ │
+            Clerk creates JWT with user claims │ │ Clerk signs JWT with private
+            key │ │ JWT sent to client application │
+            └─────────────────────────────────────────────────────────────┘
+            ┌─────────────────────────────────────────────────────────────┐ │ 2.
+            API REQUEST (Frontend → Backend) │
+            ├─────────────────────────────────────────────────────────────┤ │
+            Client sends request with JWT: │ │ Authorization: Bearer eyJhbGc...
+            │ └─────────────────────────────────────────────────────────────┘
+            ┌─────────────────────────────────────────────────────────────┐ │ 3.
+            TOKEN VERIFICATION (Backend) │
+            ├─────────────────────────────────────────────────────────────┤ │
+            Step 1: Split JWT into parts │ │ header, payload, signature =
+            jwt.split('.') │ │ │ │ Step 2: Decode header (Base64) │ │ header = {
+            alg: "RS256", kid: "ins_2abc123xyz" } │ │ │ │ Step 3: Fetch JWKS (if
+            not cached) │ │ GET https://clerk.example/.well-known/jwks.json │ │
+            │ │ Step 4: Find matching public key │ │ key = jwks.find(k => k.kid
+            === "ins_2abc123xyz") │ │ n = key.n // Modulus │ │ e = key.e //
+            Exponent │ │ │ │ Step 5: Verify algorithm │ │ if header.alg !==
+            key.alg: reject │ │ │ │ Step 6: Decrypt signature with public key │
+            │ decrypted_hash = (signature^e) mod n │ │ │ │ Step 7: Compute hash
+            of received data │ │ computed_hash = SHA256(header + "." + payload)
+            │ │ │ │ Step 8: Compare hashes │ │ if decrypted_hash !==
+            computed_hash: reject │ │ │ │ Step 9: Decode and validate payload │
+            │ payload = JSON.parse(base64_decode(payload)) │ │ if payload.exp <
+            current_time: reject (expired) │ │ if payload.iss !==
+            expected_issuer: reject │ │ if payload.aud !== expected_audience:
+            reject │ │ │ │ Step 10: Accept token and extract claims │ │ user_id
+            = payload.sub │ │ email = payload.email │ │ // Process authenticated
+            request │
+            └─────────────────────────────────────────────────────────────┘
+          </div>
+
+          <h3>Python Implementation Example</h3>
+          <pre><code>import os
+import jwt
+from fastapi import FastAPI, Depends, HTTPException
+from fastapi_clerk_auth import ClerkConfig, ClerkHTTPBearer
+
+app = FastAPI()
+
+# Configure Clerk authentication
+clerk_config = ClerkConfig(jwks_url=os.getenv("CLERK_JWKS_URL"))
+clerk_guard = ClerkHTTPBearer(clerk_config)
+
+@app.get("/api/protected")
+def protected_route(creds = Depends(clerk_guard)):
+    """
+    This route is protected by JWT verification.
+    
+    When clerk_guard runs, it:
+    1. Extracts JWT from Authorization header
+    2. Fetches public keys from JWKS URL (cached)
+    3. Verifies signature mathematically
+    4. Validates expiration, issuer, audience
+    5. Returns decoded payload or raises 401
+    """
+    
+    # If we reach here, token is valid!
+    user_id = creds.decoded["sub"]
+    email = creds.decoded.get("email")
+    
+    return {
+        "message": "Authenticated!",
+        "user_id": user_id,
+        "email": email
+    }</code></pre>
+        </section>
+
+        <!-- Security Properties -->
+        <section id="security-properties">
+          <h2>Security Properties</h2>
+
+          <h3>
+            What JWT Signatures Guarantee <span class="icon-success"></span>
+          </h3>
+          <ul>
+            <li>
+              <strong>Authenticity</strong>: Token was created by the legitimate
+              issuer
+            </li>
+            <li>
+              <strong>Integrity</strong>: Token content has not been modified
+            </li>
+            <li>
+              <strong>Non-repudiation</strong>: Issuer cannot deny creating the
+              token
+            </li>
+          </ul>
+
+          <h3>
+            What JWT Signatures Do NOT Guarantee
+            <span class="icon-danger"></span>
+          </h3>
+          <ul>
+            <li>
+              <strong>Confidentiality</strong>: Anyone can read the payload
+            </li>
+            <li>
+              <strong>Freshness</strong>: Token could be old (check
+              <code>exp</code> claim)
+            </li>
+            <li>
+              <strong>Revocation</strong>: Token is valid until expiration (use
+              short expiry)
+            </li>
+          </ul>
+
+          <h3>Additional Validations Required</h3>
+          <p><strong>Always validate:</strong></p>
+          <ul>
+            <li><code>exp</code> (expiration): Is token still valid?</li>
+            <li><code>iss</code> (issuer): Does it match expected issuer?</li>
+            <li>
+              <code>aud</code> (audience): Is it intended for your application?
+            </li>
+            <li><code>iat</code> (issued at): Is token suspiciously old?</li>
+            <li><code>nbf</code> (not before): Has token validity started?</li>
+          </ul>
+
+          <h3>Security Best Practices</h3>
+          <div
+            style="
+              display: grid;
+              grid-template-columns: repeat(2, 1fr);
+              gap: 1rem;
+              margin: 1.5rem 0;
+            "
+          >
+            <div class="callout callout-info">
+              <div class="callout-title">Token Expiration</div>
+              <ul>
+                <li>Use short expiration times (minutes to hours)</li>
+                <li>Refresh tokens for long-lived sessions</li>
+                <li>Balance security vs user experience</li>
+              </ul>
+            </div>
+            <div class="callout callout-info">
+              <div class="callout-title">Token Storage</div>
+              <ul>
+                <li>Never store in localStorage (vulnerable to XSS)</li>
+                <li>Use httpOnly cookies when possible</li>
+                <li>Consider sessionStorage for SPAs</li>
+              </ul>
+            </div>
+            <div class="callout callout-info">
+              <div class="callout-title">Key Rotation</div>
+              <ul>
+                <li>Rotate keys regularly (quarterly/yearly)</li>
+                <li>Support multiple keys during rotation</li>
+                <li>Monitor for suspicious key usage</li>
+              </ul>
+            </div>
+            <div class="callout callout-info">
+              <div class="callout-title">Rate Limiting</div>
+              <ul>
+                <li>Limit failed authentication attempts</li>
+                <li>Monitor for unusual patterns</li>
+                <li>Implement account lockout policies</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- Common Misconceptions -->
+        <section id="misconceptions">
+          <h2>Common Misconceptions</h2>
+
+          <h3>Misconception 1: "JWTs are encrypted"</h3>
+          <p>
+            <strong>Reality</strong>: JWTs are Base64-encoded, not encrypted.
+            Anyone can decode and read the payload.
+          </p>
+          <pre><code>const jwt = "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJ1c2VyXzEyMyIsImVtYWlsIjoidXNlckBleGFtcGxlLmNvbSJ9.signature"
+
+// Anyone can do this:
+const [header, payload, signature] = jwt.split('.')
+const decoded_payload = JSON.parse(atob(payload))
+console.log(decoded_payload)
+// { sub: "user_123", email: "user@example.com" }</code></pre>
+          <p>
+            <strong>Takeaway</strong>: Never put sensitive data in JWTs
+            (passwords, credit cards, private keys).
+          </p>
+
+          <h3>
+            Misconception 2: "If public keys are public, anyone can create valid
+            tokens"
+          </h3>
+          <p>
+            <strong>Reality</strong>: Public keys can only
+            <strong>verify</strong> signatures, not
+            <strong>create</strong> them.
+          </p>
+          <pre><code>Creating signature requires private key 'd':
+  signature = (hash^d) mod n
+
+Verifying signature uses public key 'e':
+  decrypted = (signature^e) mod n
+
+Computing 'd' from 'e' and 'n' requires factoring n (infeasible).</code></pre>
+
+          <h3>Misconception 3: "HTTPS makes JWT signatures unnecessary"</h3>
+          <p>
+            <strong>Reality</strong>: HTTPS protects data
+            <strong>in transit</strong>, JWT signatures protect
+            <strong>data integrity and authenticity</strong>.
+          </p>
+          <pre><code>HTTPS protects:          JWT signatures protect:
+├─ Man-in-middle attacks ├─ Token tampering
+├─ Eavesdropping         ├─ Forgery
+└─ Transit encryption    ├─ Authenticity
+                         └─ Integrity
+
+Both are necessary!</code></pre>
+
+          <h3>Misconception 4: "Longer expiration times are convenient"</h3>
+          <p>
+            <strong>Reality</strong>: Long expiration times create security
+            risks.
+          </p>
+          <p><strong>Best Practice:</strong></p>
+          <ul>
+            <li>Access tokens: 15 minutes - 1 hour</li>
+            <li>Refresh tokens: days to weeks</li>
+            <li>Implement token refresh flow</li>
+          </ul>
+
+          <h3>Misconception 5: "Signature verification is slow"</h3>
+          <p>
+            <strong>Reality</strong>: Modern JWT verification is extremely fast.
+          </p>
+          <ul>
+            <li>RSA signature verification: ~0.1-1 ms</li>
+            <li>JWKS fetch: once, then cached</li>
+            <li>No database lookups required</li>
+            <li>No network calls to auth provider</li>
+          </ul>
+          <pre><code>10,000 JWT verifications: ~500ms
+= 0.05ms per verification
+= 20,000 verifications per second per core</code></pre>
+        </section>
+
+        <!-- Summary -->
+        <section id="summary">
+          <h2>Summary</h2>
+
+          <h3>Key Takeaways</h3>
+          <ol>
+            <li>
+              <strong>JWKS provides public keys</strong> for verifying JWT
+              signatures without contacting the issuer
+            </li>
+            <li>
+              <strong>JWT signatures use asymmetric cryptography</strong>:
+              <ul>
+                <li>Private key (secret) creates signatures</li>
+                <li>Public key (shared) verifies signatures</li>
+                <li>Only the private key holder can create valid tokens</li>
+              </ul>
+            </li>
+            <li>
+              <strong>Signatures must be "encrypted"</strong> (mathematically
+              transformed):
+              <ul>
+                <li>Direct hash: anyone can compute → no authenticity</li>
+                <li>Signed hash: only issuer can create → proves origin</li>
+              </ul>
+            </li>
+            <li>
+              <strong>Verification is mathematical proof</strong>:
+              <ul>
+                <li>
+                  <code>(hash^d)^e ≡ hash (mod n)</code> only when d/e match
+                </li>
+                <li>Tampering breaks the signature immediately</li>
+                <li>Computing private key from public key is infeasible</li>
+              </ul>
+            </li>
+            <li>
+              <strong>JWTs are not encrypted</strong> - don't put sensitive data
+              in them
+            </li>
+            <li>
+              <strong>Always validate claims</strong> - signature alone isn't
+              enough
+            </li>
+            <li>
+              <strong>JWKS enables stateless, scalable authentication</strong>
+              without compromising security
+            </li>
+          </ol>
+        </section>
+
+        <!-- Additional Resources -->
+        <section id="resources">
+          <h2>Additional Resources</h2>
+
+          <h3>Further Reading</h3>
+          <ul>
+            <li>
+              <a
+                href="https://datatracker.ietf.org/doc/html/rfc7519"
+                target="_blank"
+                >RFC 7519: JSON Web Token (JWT)</a
+              >
+            </li>
+            <li>
+              <a
+                href="https://datatracker.ietf.org/doc/html/rfc7517"
+                target="_blank"
+                >RFC 7517: JSON Web Key (JWK)</a
+              >
+            </li>
+            <li>
+              <a
+                href="https://datatracker.ietf.org/doc/html/rfc7518"
+                target="_blank"
+                >RFC 7518: JSON Web Algorithms (JWA)</a
+              >
+            </li>
+            <li>
+              <a href="https://jwt.io/" target="_blank"
+                >jwt.io - JWT debugger and library list</a
+              >
+            </li>
+          </ul>
+
+          <h3>Tools</h3>
+          <ul>
+            <li>
+              <a href="https://jwt.io" target="_blank">JWT Debugger</a> - Decode
+              and verify JWTs
+            </li>
+            <li>
+              <a href="https://cryptotools.net/rsagen" target="_blank"
+                >Online RSA Key Generator</a
+              >
+              - Generate RSA key pairs
+            </li>
+            <li>
+              <a href="https://jwks-inspector.vercel.app/" target="_blank"
+                >JWKS Inspector</a
+              >
+              - Inspect JWKS endpoints
+            </li>
+          </ul>
+        </section>
+
+        <!-- Footer -->
+        <div class="footer">
+          <p><em>Created: December 31, 2025</em></p>
+          <p>Reference Documentation for JWT and JWKS Authentication</p>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>
