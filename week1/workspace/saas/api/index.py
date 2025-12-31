@@ -2,64 +2,84 @@ import os
 import logging
 from fastapi import FastAPI, Depends  # type: ignore
 from fastapi.responses import StreamingResponse  # type: ignore
+from pydantic import BaseModel  # type: ignore
 from fastapi_clerk_auth import ClerkConfig, ClerkHTTPBearer, HTTPAuthorizationCredentials  # type: ignore
 from openai import OpenAI  # type: ignore
 
 app = FastAPI()
-
-# Setup logging to catch streaming errors without crashing the server
 logger = logging.getLogger(__name__)
 
-# Clerk Configuration
 clerk_config = ClerkConfig(jwks_url=os.getenv("CLERK_JWKS_URL"))
 clerk_guard = ClerkHTTPBearer(clerk_config)
 
 # Azure / OpenAI Configuration
-# Note: Using OpenAI() defaults to environment variables OPENAI_API_KEY
 endpoint = "https://poc-arjun-oai.openai.azure.com/openai/v1"
 deployment_name = "gpt-5-nano"
 
-@app.get("/api")
-def idea(creds: HTTPAuthorizationCredentials = Depends(clerk_guard)):
-    # Authenticated user ID available for database logging or rate limiting
+class Visit(BaseModel):
+    patient_name: str
+    date_of_visit: str
+    notes: str
+
+system_prompt = """
+You are provided with notes written by a doctor from a patient's visit.
+Your job is to summarize the visit for the doctor and provide an email.
+Reply with exactly three sections with the headings:
+### Summary of visit for the doctor's records
+### Next steps for the doctor
+### Draft of email to patient in patient-friendly language
+"""
+
+def user_prompt_for(visit: Visit) -> str:
+    return f"""Create the summary, next steps and draft email for:
+Patient Name: {visit.patient_name}
+Date of Visit: {visit.date_of_visit}
+Notes:
+{visit.notes}"""
+
+@app.post("/api")
+def consultation_summary(
+    visit: Visit,
+    creds: HTTPAuthorizationCredentials = Depends(clerk_guard),
+):
     user_id = creds.decoded["sub"] 
-    
     client = OpenAI(base_url=endpoint)
-    prompt = [{"role": "user", "content": "Reply with a new business idea for AI Agents, formatted with headings, sub-headings and bullet points"}]
-    
+
+    user_prompt = user_prompt_for(visit)
+
+    prompt = [
+        {"role": "system", "content": system_prompt},
+        {"role": "user", "content": user_prompt},
+    ]
+
     stream = client.chat.completions.create(
-        model=deployment_name, 
-        messages=prompt, 
-        stream=True
+        model=deployment_name, # Standard practice to use the variable here
+        messages=prompt,
+        stream=True,
     )
 
     def event_stream():
         try:
             for chunk in stream:
-                # 1. Initialize text to avoid UnboundLocalError
                 text = None
                 
-                # 2. Safety check for empty choices (common in Azure/OpenAI end-of-stream)
+                # 1. Safety check: Ensure choices exists and is not empty
                 if chunk.choices and len(chunk.choices) > 0:
-                    # 3. Safely get content using getattr to avoid AttributeError
+                    # 2. Safety check: Ensure delta has content (it's often None in first/last chunks)
                     text = getattr(chunk.choices[0].delta, "content", None)
 
                 if text:
-                    # 4. Standard SSE Formatting
-                    # Splitting by newline and yielding individual data packets
                     lines = text.split("\n")
-                    for line in lines:
-                        # Each line is sent as a 'data' packet
-                        yield f"data: {line}\n"
-                    
-                    # A single newline after 'data' tells SSE the message is complete
-                    yield "\n"
-                    
-            # 5. Optional: Signal the frontend that we are officially done
+                    for line in lines[:-1]:
+                        yield f"data: {line}\n\n"
+                        yield "data:  \n"
+                    yield f"data: {lines[-1]}\n\n"
+            
+            # 3. Signal completion to the frontend
             yield "data: [DONE]\n\n"
 
         except Exception as e:
-            logger.error(f"Stream error for user {user_id}: {e}")
+            logger.error(f"Streaming error for user {user_id}: {e}")
             yield f"data: [ERROR]: {str(e)}\n\n"
 
     return StreamingResponse(event_stream(), media_type="text/event-stream")
