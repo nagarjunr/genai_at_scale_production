@@ -365,8 +365,17 @@ CLERK_JWKS_URL=https://...
 OPENAI_API_KEY=sk-...
 
 # Add AWS configuration (use your chosen region from earlier) - us-east-1 or eu-west-1 etc
+# DEFAULT_AWS_REGION=us-east-1
+# AWS_ACCOUNT_ID=123456789012
+
+#In Corporate setting
 DEFAULT_AWS_REGION=us-east-1
-AWS_ACCOUNT_ID=123456789012
+AWS_PROFILE=BD-IN-AM-Sandbox-Admin
+AWS_ACCOUNT_ID=908027410936
+
+#Proxy variables in corporate setup
+PROXY="http://rb-proxy-na.bosch.com:8080"
+NO_PROXY="127.0.0.1,*.bosch.com"
 ```
 
 **To find your AWS Account ID**:
@@ -483,6 +492,15 @@ docker build \
   -t consultation-app .
 ```
 
+In corporate setting:
+```bash
+docker build \
+  --build-arg NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY" \
+  --build-arg http_proxy="$PROXY" \
+  --build-arg https_proxy="$PROXY" \
+  -t consultation-app .
+```
+
 **Windows PowerShell**:
 ```powershell
 docker build `
@@ -500,6 +518,17 @@ docker run -p 8000:8000 \
   -e CLERK_SECRET_KEY="$CLERK_SECRET_KEY" \
   -e CLERK_JWKS_URL="$CLERK_JWKS_URL" \
   -e OPENAI_API_KEY="$OPENAI_API_KEY" \
+  consultation-app
+```
+
+In corporate setting:
+```bash
+docker run -p 8000:8000 \
+  -e CLERK_SECRET_KEY="$CLERK_SECRET_KEY" \
+  -e CLERK_JWKS_URL="$CLERK_JWKS_URL" \
+  -e OPENAI_API_KEY="$OPENAI_API_KEY" \
+  -e http_proxy="$PROXY" \
+  -e https_proxy="$PROXY" \
   consultation-app
 ```
 
@@ -603,6 +632,14 @@ aws ecr get-login-password --region $DEFAULT_AWS_REGION | docker login --usernam
 docker build \
   --platform linux/amd64 \
   --build-arg NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY" \
+  -t consultation-app .
+
+#In corporate setting:
+docker build \
+  --platform linux/amd64 \
+  --build-arg NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY" \
+  --build-arg http_proxy="$PROXY" \
+  --build-arg https_proxy="$PROXY" \
   -t consultation-app .
 
 # 3. Tag your image (using your .env values!)
