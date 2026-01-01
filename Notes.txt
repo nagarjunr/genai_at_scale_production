@@ -1,0 +1,53 @@
+Set Env Vars: export $(cat .env | grep -v '^#' | xargs)
+-----
+.env: (file content)
+NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=<>
+CLERK_SECRET_KEY=<>
+CLERK_JWKS_URL=https://topical-gnu-25.clerk.accounts.dev/.well-known/jwks.json
+OPENAI_API_KEY=<>
+
+DEFAULT_AWS_REGION=us-east-1
+AWS_ACCOUNT_ID=908027410936
+
+#To run in docker
+PROXY="http://rb-proxy-na.bosch.com:8080"
+NO_PROXY="127.0.0.1,*.bosch.com"
+-----
+
+Local Build:
+docker build \
+  --build-arg NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY" \
+  --build-arg http_proxy="$PROXY" \
+  --build-arg https_proxy="$PROXY" \
+  -t consultation-app .
+
+
+docker run -p 8000:8000 \
+  -e CLERK_SECRET_KEY="$CLERK_SECRET_KEY" \                                           
+  -e CLERK_JWKS_URL="$CLERK_JWKS_URL" \
+  -e OPENAI_API_KEY="$OPENAI_API_KEY" \
+  -e 
+  consultation-app
+
+
+AWS Build:
+# Remove old image
+docker rmi consultation-app:latest
+docker rmi $AWS_ACCOUNT_ID.dkr.ecr.$DEFAULT_AWS_REGION.amazonaws.com/consultation-app:latest
+
+# Rebuild with no cache
+docker build --no-cache \
+  --platform linux/amd64 \
+  --build-arg NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY="$NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY" \
+  --build-arg http_proxy="$PROXY" \
+  --build-arg https_proxy="$PROXY" \
+  -t consultation-app .
+
+# Tag and push
+docker tag consultation-app:latest $AWS_ACCOUNT_ID.dkr.ecr.$DEFAULT_AWS_REGION.amazonaws.com/consultation-app:latest
+docker push $AWS_ACCOUNT_ID.dkr.ecr.$DEFAULT_AWS_REGION.amazonaws.com/consultation-app:latest
+
+# Force new deployment
+aws apprunner start-deployment \
+  --service-arn $(aws apprunner list-services --query "ServiceSummaryList[?ServiceName=='consultation-app-service'].ServiceArn | [0]" --output text) \
+  --region $DEFAULT_AWS_REGION
