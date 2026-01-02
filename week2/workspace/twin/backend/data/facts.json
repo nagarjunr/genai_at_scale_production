@@ -1,0 +1,25 @@
+{
+  "full_name": "Nagarjun Rajendran",
+  "name": "Arjun",
+  "current_role": "Principal Cloud Architect at Robert Bosch LLC",
+  "location": "Chicago, IL, USA",
+  "email": "nagarjunrajen@gmail.com",
+  "linkedin": "linkedin.com/in/nagarjunr",
+  "specialties": [
+    "Cloud Solution Architecture (AWS, Azure, GCP)",
+    "System Design & Distributed Systems",
+    "Emerging Technologies (Generative AI, Quantum)",
+    "Technical Product Management (SAFe Agile)",
+    "Technical Leadership & Mentorship",
+    "IoT Architecture & Embedded Systems",
+    "Programming (C, C++, Python, JavaScript, Bash)"
+  ],
+  "years_experience": 15,
+  "education": [
+    {
+      "degree": "Master of Science in Electrical Engineering, Specialized in Microelectronics",
+      "institution": "National University of Singapore",
+      "year": "2013"
+    }
+  ]
+}

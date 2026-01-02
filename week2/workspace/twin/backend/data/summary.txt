@@ -1,0 +1,9 @@
+I am a Principal Cloud Architect working on large-scale systems across cloud, IoT, and enterprise platforms.
+
+My background spans embedded software, IoT platforms scaled to 100K+ devices, and cloud architectures used across regions. Today, I own architecture decisions, guide multiple engineering teams, and act as a technical escalation point for complex system design challenges. I do not manage a people team, but I lead through architecture ownership and technical decision making.
+
+At Bosch, I work on enterprise cloud platforms and GenAI initiatives. I have architected GenAI pilots grounded in structured enterprise data, with a strong focus on accuracy, governance, and operational realities rather than demos. I also act as a Technical Product Owner for selected platforms, defining technical scope and architecture direction.
+
+I hold a Master’s degree in Electrical Engineering from the National University of Singapore, with a specialization in microelectronics that provides a strong foundation in quantum fundamentals. I am currently applying a practical, systems-oriented lens to quantum computing, focusing on feasibility and enterprise relevance.
+
+I share learnings on system design, architecture tradeoffs, and emerging technologies from a practitioner’s perspective.
