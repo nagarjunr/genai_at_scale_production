@@ -4,13 +4,11 @@ from pydantic import BaseModel
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
-from typing import Optional
+from typing import Optional, List, Dict
+import json
 import uuid
-import logging
-
-# Configure logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+from datetime import datetime
+from pathlib import Path
 
 # Load environment variables
 load_dotenv(override=True)
@@ -34,6 +32,10 @@ app.add_middleware(
 # Initialize OpenAI client
 client = OpenAI(base_url=endpoint)
 
+# Memory directory
+MEMORY_DIR = Path("../memory")
+MEMORY_DIR.mkdir(exist_ok=True)
+
 
 # Load personality details
 def load_personality():
@@ -42,6 +44,23 @@ def load_personality():
 
 
 PERSONALITY = load_personality()
+
+
+# Memory functions
+def load_conversation(session_id: str) -> List[Dict]:
+    """Load conversation history from file"""
+    file_path = MEMORY_DIR / f"{session_id}.json"
+    if file_path.exists():
+        with open(file_path, "r", encoding="utf-8") as f:
+            return json.load(f)
+    return []
+
+
+def save_conversation(session_id: str, messages: List[Dict]):
+    """Save conversation history to file"""
+    file_path = MEMORY_DIR / f"{session_id}.json"
+    with open(file_path, "w", encoding="utf-8") as f:
+        json.dump(messages, f, indent=2, ensure_ascii=False)
 
 
 # Request/Response models
@@ -57,7 +76,7 @@ class ChatResponse(BaseModel):
 
 @app.get("/")
 async def root():
-    return {"message": "AI Digital Twin API"}
+    return {"message": "AI Digital Twin API with Memory"}
 
 
 @app.get("/health")
@@ -71,31 +90,57 @@ async def chat(request: ChatRequest):
         # Generate session ID if not provided
         session_id = request.session_id or str(uuid.uuid4())
         
-        logger.info(f"Received chat request: {request.message[:50]}...")
-        logger.info(f"Session ID: {session_id}")
-
-        # Create system message with personality
-        # NOTE: No memory - each request is independent!
-        messages = [
-            {"role": "system", "content": PERSONALITY},
-            {"role": "user", "content": request.message},
-        ]
-
+        # Load conversation history
+        conversation = load_conversation(session_id)
+        
+        # Build messages with history
+        messages = [{"role": "system", "content": PERSONALITY}]
+        
+        # Add conversation history
+        for msg in conversation:
+            messages.append(msg)
+        
+        # Add current message
+        messages.append({"role": "user", "content": request.message})
+        
         # Call OpenAI API
-        logger.info(f"Calling OpenAI with model: {deployment_name}")
         response = client.chat.completions.create(
-            model=deployment_name, 
+            model=deployment_name,
             messages=messages
         )
-
+        
+        assistant_response = response.choices[0].message.content
+        
+        # Update conversation history
+        conversation.append({"role": "user", "content": request.message})
+        conversation.append({"role": "assistant", "content": assistant_response})
+        
+        # Save updated conversation
+        save_conversation(session_id, conversation)
+        
         return ChatResponse(
-            response=response.choices[0].message.content, 
+            response=assistant_response,
             session_id=session_id
         )
 
     except Exception as e:
-        logger.error(f"Error in chat endpoint: {str(e)}", exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@app.get("/sessions")
+async def list_sessions():
+    """List all conversation sessions"""
+    sessions = []
+    for file_path in MEMORY_DIR.glob("*.json"):
+        session_id = file_path.stem
+        with open(file_path, "r", encoding="utf-8") as f:
+            conversation = json.load(f)
+            sessions.append({
+                "session_id": session_id,
+                "message_count": len(conversation),
+                "last_message": conversation[-1]["content"] if conversation else None
+            })
+    return {"sessions": sessions}
 
 
 if __name__ == "__main__":
