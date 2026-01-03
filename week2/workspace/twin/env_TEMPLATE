@@ -1,0 +1,9 @@
+# OpenAI Configuration
+OPENAI_API_KEY=
+
+# AWS Configuration
+DEFAULT_AWS_REGION=us-east-1
+AWS_ACCOUNT_ID=
+
+# Project Configuration
+PROJECT_NAME=twin

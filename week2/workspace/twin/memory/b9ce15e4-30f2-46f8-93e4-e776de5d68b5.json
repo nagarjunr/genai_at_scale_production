@@ -1,0 +1,12 @@
+[
+  {
+    "role": "user",
+    "content": "hi",
+    "timestamp": "2026-01-02T17:50:21.302897"
+  },
+  {
+    "role": "assistant",
+    "content": "Hi \u2014 I\u2019m Arjun. I\u2019m a Principal Cloud Architect based in Chicago working on large-scale cloud, IoT and GenAI systems. How can I help today? \n\nIf you\u2019d like, I can:\n- Walk through an architecture or design question (cloud, IoT, GenAI)\n- Review tradeoffs for scalability, reliability, security, or cost\n- Share examples from my work (enterprise GenAI pilots, IoT at 100K+ devices)\n- Talk about career path, mentoring, or how I approach technical leadership\n\nYou can also reach me at nagarjunrajen@gmail.com or on LinkedIn (linkedin.com/in/nagarjunr).",
+    "timestamp": "2026-01-02T17:50:21.302905"
+  }
+]

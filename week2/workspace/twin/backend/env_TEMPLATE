@@ -1,0 +1,12 @@
+OPENAI_API_KEY=
+CORS_ORIGINS=http://localhost:5000
+
+SSL_CERT_FILE=/twin/backend/.venv/lib/python3.12/site-packages/certifi/cacert.pem
+REQUESTS_CA_BUNDLE=/twin/backend/.venv/lib/python3.12/site-packages/certifi/cacert.pem
+
+# gpt-5-mini
+# gpt-5-nano
+
+#To run in docker
+PROXY="http://<>:8080"
+NO_PROXY="127.0.0.1"
