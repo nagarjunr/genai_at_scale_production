@@ -11,19 +11,6 @@ export default function Home() {
 
       <div className="container mx-auto px-4 py-6 md:py-8 h-screen flex flex-col relative z-10">
         <div className="max-w-6xl mx-auto w-full flex flex-col h-full">
-          {/* Elegant header */}
-          <div className="text-center mb-4 md:mb-6">
-            <div className="inline-block">
-              <h1 className="text-4xl md:text-6xl font-extrabold bg-gradient-to-r from-cyan-600 via-sky-500 to-cyan-600 bg-clip-text text-transparent tracking-tight pb-2">
-                Digital Twin
-              </h1>
-              <div className="h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent rounded-full mt-2" />
-            </div>
-            <p className="text-sm md:text-base text-cyan-600/80 mt-3 font-medium tracking-wide">
-              Nagarjun Rajendran
-            </p>
-          </div>
-
           {/* Chat interface with elegant frame */}
           <div className="flex-1 min-h-0 mb-4">
             <Twin />

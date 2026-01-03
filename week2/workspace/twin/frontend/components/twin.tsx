@@ -40,8 +40,8 @@ export default function Twin() {
         setIsLoading(true);
 
         try {
-            const response = await fetch('http://localhost:8000/chat', {
-            // const response = await fetch('https://dnm0cc4ukk.execute-api.us-east-1.amazonaws.com/chat', {
+            // const response = await fetch('http://localhost:8000/chat', {
+            const response = await fetch('https://dnm0cc4ukk.execute-api.us-east-1.amazonaws.com/chat', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -100,8 +100,8 @@ export default function Twin() {
                         <Bot className="w-6 h-6 md:w-7 md:h-7 text-white" />
                     </div>
                     <div>
-                        <h2 className="text-lg md:text-xl font-bold tracking-tight">AI Digital Twin</h2>
-                        <p className="text-xs md:text-sm text-cyan-50/90 font-light mt-1.5">Nagarjun Rajendran</p>
+                        <h2 className="text-lg md:text-xl font-bold tracking-tight">Chat with Nagarjun's Twin</h2>
+                        <p className="text-xs md:text-sm text-cyan-50/90 font-light mt-1.5">AI-Powered Digital Assistant</p>
                     </div>
                 </div>
             </div>
@@ -118,7 +118,7 @@ export default function Twin() {
                         </div>
                         <h3 className="text-xl md:text-2xl font-bold text-cyan-700 mb-2">Welcome</h3>
                         <p className="text-sm md:text-base text-cyan-600/70 max-w-md">
-                            Start a conversation to explore insights and expertise of Nagarjun Rajendran.
+                            How can I help you today?
                         </p>
                     </div>
                 )}
@@ -193,7 +193,7 @@ export default function Twin() {
                         value={input}
                         onChange={(e) => setInput(e.target.value)}
                         onKeyDown={handleKeyPress}
-                        placeholder="Type your message..."
+                        placeholder="Ask a question..."
                         className="flex-1 px-5 md:px-6 py-3 md:py-4 border border-cyan-200/60 rounded-2xl focus:outline-none focus:ring-2 focus:ring-cyan-400/50 focus:border-cyan-400 text-gray-800 bg-white/80 placeholder-cyan-400/60 text-sm md:text-base shadow-sm transition-all"
                         disabled={isLoading}
                     />
