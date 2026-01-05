@@ -3,12 +3,6 @@ FROM node:22.13-alpine AS frontend-builder
 
 WORKDIR /app
 
-#To run in local docker
-# ARG http_proxy="http://rb-proxy-na.bosch.com:8080"
-# ARG https_proxy="http://rb-proxy-na.bosch.com:8080"
-# ARG HTTP_PROXY="http://rb-proxy-na.bosch.com:8080"
-# ARG HTTPS_PROXY="http://rb-proxy-na.bosch.com:8080"
-
 # Copy package files first (for better caching)
 COPY package*.json ./
 RUN npm ci
@@ -31,23 +25,6 @@ RUN npm run build
 FROM python:3.12-slim
 
 WORKDIR /app
-
-#To run in local docker
-# ARG http_proxy="http://rb-proxy-na.bosch.com:8080"
-# ARG https_proxy="http://rb-proxy-na.bosch.com:8080"
-# ARG HTTP_PROXY="http://rb-proxy-na.bosch.com:8080"
-# ARG HTTPS_PROXY="http://rb-proxy-na.bosch.com:8080"
-
-# Fix SSL_CERTS CERTIFICATE_VERIFY_FAILED issue - Not needed, just proxy variables should be enough
-# RUN pip install --trusted-host pypi.org --trusted-host files.pythonhosted.org certifi
-# RUN CACERT_PATH=$(python -c "import certifi; print(certifi.where())") && \
-#     echo "Found cacert.pem at: $CACERT_PATH" && \
-#     echo "export REQUESTS_CA_BUNDLE=$CACERT_PATH" >> /etc/profile.d/requests_ca_bundle.sh && \
-#     echo "$CACERT_PATH" > /tmp/cacert_path.txt
-# # ENV REQUESTS_CA_BUNDLE=/tmp/cacert_path.txt
-# # RUN export REQUESTS_CA_BUNDLE=$(cat /tmp/cacert_path.txt)
-# COPY ./certs/* /app/certs/
-# RUN python /app/certs/update_certs_python.py
 
 # Install Python dependencies
 COPY requirements.txt .

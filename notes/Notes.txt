@@ -51,3 +51,6 @@ docker push $AWS_ACCOUNT_ID.dkr.ecr.$DEFAULT_AWS_REGION.amazonaws.com/consultati
 aws apprunner start-deployment \
   --service-arn $(aws apprunner list-services --query "ServiceSummaryList[?ServiceName=='consultation-app-service'].ServiceArn | [0]" --output text) \
   --region $DEFAULT_AWS_REGION
+
+
+"arn:aws:iam::908027410936:role/github-actions-twin-deploy"
